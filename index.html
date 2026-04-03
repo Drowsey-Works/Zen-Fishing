@@ -1,945 +1,2361 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Zen Fisher: Mobile</title>
+    <title>Zen Fisher: Tides of Eternity</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
             --bg: #111214;
-            --panel: rgba(25, 27, 30, 0.92);
-            --panel-border: rgba(255, 255, 255, 0.15);
+            --panel: rgba(22, 24, 28, 0.95);
+            --panel-border: rgba(255, 255, 255, 0.12);
             --accent: #00b0f0;
-            --accent-hover: #0090c0;
+            --accent-h: #0090c0;
             --success: #00b84c;
-            --success-shadow: #008f3b;
+            --success-h: #008f3b;
             --text: #f8fafc;
-            --btn-bg: #393b3d;
-            --btn-border: #2a2c2e;
-            --nav-bg: rgba(14, 15, 18, 0.98);
-            --common: #cbd5e1; --uncommon: #4ade80; --rare: #60a5fa;
-            --epic: #c084fc; --legendary: #fbbf24; --ultrarare: #f43f5e;
-            --mythical: #c084fc; --divine: #facc15; --secret: #ffffff;
+            --btn: #393b3d;
+            --btn-b: #2a2c2e;
+            --nav: rgba(12, 13, 16, 0.98);
         }
 
-        * { -webkit-tap-highlight-color: transparent; touch-action: manipulation; box-sizing: border-box; }
-
-        body, html {
-            margin: 0; padding: 0; overflow: hidden;
-            font-family: 'Gotham', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg); color: var(--text);
-            user-select: none; -webkit-touch-callout: none;
-            position: fixed; width: 100%; height: 100%;
+        * {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
         }
 
-        #app { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; }
+        html,
+        body {
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            user-select: none;
+            -webkit-touch-callout: none;
+            position: fixed;
+            width: 100%;
+            height: 100%
+        }
 
-        /* ===== CANVAS ===== */
-        #canvas-container { flex: 1; position: relative; overflow: hidden; }
-        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+        #app {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column
+        }
 
-        /* ===== TOP BAR ===== */
+        #canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            touch-action: none
+        }
+
+        #tap-zone {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent
+        }
+
         #top-bar {
-            position: fixed; top: 10px; left: 10px; right: 10px;
+            position: fixed;
+            top: 8px;
+            left: 8px;
+            right: 8px;
             background: var(--panel);
-            backdrop-filter: blur(12px);
-            border: 2px solid var(--panel-border);
-            border-radius: 12px;
-            padding: 8px 14px;
-            display: flex; justify-content: space-between; align-items: center;
-            z-index: 45; pointer-events: auto;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-        }
-        #top-bar .area-label { font-size: 0.72rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
-        #top-bar .area-name { font-weight: bold; font-size: 0.95rem; color: #fff; }
-        #money-pill {
-            background: rgba(0,0,0,0.5);
-            border: 2px solid rgba(250,204,21,0.35);
-            border-radius: 8px; padding: 4px 12px;
-            font-weight: 900; color: #facc15; font-size: 1rem;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            backdrop-filter: blur(14px);
+            border: 1.5px solid var(--panel-border);
+            border-radius: 14px;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 45;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+            gap: 8px
         }
 
-        /* ===== ROBLOX-STYLE 3D BUTTONS ===== */
+        .area-label {
+            font-size: 0.65rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px
+        }
+
+        .area-name {
+            font-weight: 800;
+            font-size: 0.88rem;
+            color: #fff
+        }
+
+        #money-pill {
+            background: rgba(0, 0, 0, 0.55);
+            border: 1.5px solid rgba(250, 204, 21, 0.4);
+            border-radius: 10px;
+            padding: 5px 12px;
+            font-weight: 900;
+            color: #facc15;
+            font-size: 0.95rem;
+            white-space: nowrap
+        }
+
+        #xp-bar-wrap {
+            position: fixed;
+            top: 62px;
+            left: 8px;
+            right: 8px;
+            height: 5px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 3px;
+            z-index: 44;
+            overflow: hidden
+        }
+
+        #xp-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7c3aed, #00b0f0);
+            border-radius: 3px;
+            transition: width 0.4s ease
+        }
+
+        #level-badge {
+            position: fixed;
+            top: 72px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            z-index: 44;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #facc15;
+            pointer-events: none;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+
+        #level-badge i {
+            font-size: 0.7rem;
+            color: #facc15;
+        }
+
+        #level-badge span {
+            font-weight: 900;
+            color: #fff;
+            margin-left: 2px;
+        }
+
+        #weather-banner {
+            position: fixed;
+            top: 72px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            z-index: 43;
+            pointer-events: none;
+            white-space: nowrap
+        }
+
         button {
             width: 100%;
-            background: var(--btn-bg);
-            border: 2px solid var(--btn-border);
-            color: white; padding: 11px 14px;
-            border-radius: 8px; cursor: pointer;
-            font-weight: bold; font-size: 0.9rem; font-family: inherit;
-            transition: all 0.08s ease;
-            box-shadow: 0 4px 0 var(--btn-border);
-            margin-bottom: 6px; text-align: left;
+            background: var(--btn);
+            border: 2px solid var(--btn-b);
+            color: #fff;
+            padding: 13px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.92rem;
+            font-family: inherit;
+            transition: all 0.07s ease;
+            box-shadow: 0 4px 0 var(--btn-b);
+            margin-bottom: 8px;
+            text-align: left;
+            min-height: 50px
         }
-        button:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0px 0 var(--btn-border); }
-        button:hover:not(:disabled) { filter: brightness(1.15); }
-        button:disabled { background: #2a2c2e; color: #444; cursor: not-allowed; box-shadow: 0 4px 0 #1a1b1c; border-color: #1a1b1c; }
 
-        .btn-buy    { background: var(--success);   border-color: var(--success-shadow); box-shadow: 0 4px 0 var(--success-shadow); }
-        .btn-equip  { background: var(--accent);    border-color: var(--accent-hover);   box-shadow: 0 4px 0 var(--accent-hover); }
-        .btn-equipped { background: transparent; border: 2px dashed #555; color: #666; box-shadow: none; }
-        .btn-dex    { background: #7c3aed; border-color: #5b21b6; box-shadow: 0 4px 0 #5b21b6; width: auto; padding: 8px 14px; margin: 0; }
-        .btn-reset  { background: transparent; border: 2px solid #ef4444; color: #ef4444; box-shadow: none; font-size: 0.82rem; }
+        button:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: none
+        }
 
-        /* ===== TAB PANELS ===== */
+        button:hover:not(:disabled) {
+            filter: brightness(1.12)
+        }
+
+        button:disabled {
+            background: #252729;
+            color: #3a3d40;
+            cursor: not-allowed;
+            box-shadow: 0 4px 0 #1a1b1c;
+            border-color: #1a1b1c
+        }
+
+        .btn-buy {
+            background: var(--success);
+            border-color: var(--success-h);
+            box-shadow: 0 4px 0 var(--success-h)
+        }
+
+        .btn-equip {
+            background: var(--accent);
+            border-color: var(--accent-h);
+            box-shadow: 0 4px 0 var(--accent-h)
+        }
+
+        .btn-equipped {
+            background: transparent;
+            border: 2px dashed #3a3d40;
+            color: #555;
+            box-shadow: none
+        }
+
+        .btn-dex {
+            background: #7c3aed;
+            border-color: #5b21b6;
+            box-shadow: 0 4px 0 #5b21b6;
+            width: auto;
+            padding: 7px 12px;
+            margin: 0;
+            font-size: 0.82rem;
+            min-height: 0
+        }
+
+        .btn-reset {
+            background: transparent;
+            border: 2px solid #ef4444;
+            color: #ef4444;
+            box-shadow: none;
+            font-size: 0.82rem
+        }
+
+        .btn-save-slot {
+            background: var(--accent);
+            border-color: var(--accent-h);
+            box-shadow: 0 4px 0 var(--accent-h);
+            text-align: center;
+            font-size: 0.75rem;
+            padding: 8px;
+            min-height: 40px;
+        }
+
         .tab-panel {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(10,11,14,0.97); backdrop-filter: blur(18px);
-            z-index: 50; display: none; flex-direction: column;
-            overflow: hidden; padding-bottom: 70px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(9, 10, 13, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 50;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            padding-bottom: 90px
         }
-        .tab-panel.active { display: flex; }
+
+        .tab-panel.active {
+            display: flex
+        }
 
         .panel-header {
-            padding: 58px 16px 14px;
-            border-bottom: 2px solid rgba(255,255,255,0.1);
-            background: var(--panel); backdrop-filter: blur(10px);
-            position: sticky; top: 0; z-index: 10;
+            padding: 56px 16px 14px;
+            border-bottom: 1.5px solid rgba(255, 255, 255, 0.08);
+            background: var(--panel);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 10
         }
+
         .panel-header h3 {
-            margin: 0; font-size: 1.05rem;
-            text-transform: uppercase; letter-spacing: 2px; color: #fff;
+            margin: 0;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #fff
         }
-        .panel-body { flex: 1; overflow-y: auto; padding: 14px; }
 
-        /* ===== BOTTOM NAV ===== */
+        .panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px
+        }
+
         #bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: var(--nav-bg); backdrop-filter: blur(20px);
-            border-top: 2px solid var(--panel-border);
-            display: flex; justify-content: space-around; align-items: center;
-            padding: 8px 8px 16px; z-index: 100;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--nav);
+            backdrop-filter: blur(22px);
+            border-top: 1.5px solid var(--panel-border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 4px 20px;
+            z-index: 100;
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.7)
         }
-        .nav-item {
-            flex: 1; display: flex; flex-direction: column;
-            align-items: center; gap: 4px;
-            background: none; border: none; color: #444;
-            font-size: 0.62rem; font-weight: 700; font-family: inherit;
-            padding: 6px 0; margin: 0;
-            transition: color 0.1s; box-shadow: none;
-            text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .nav-item i { font-size: 1.25rem; }
-        .nav-item.active { color: var(--accent); }
-        .nav-item:active { transform: none; box-shadow: none; filter: none; }
 
-        /* ===== UPGRADE ITEMS ===== */
-        .upgrade-item {
-            background: rgba(0,0,0,0.35); margin-bottom: 10px;
-            padding: 12px; border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.07);
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: #444;
+            font-size: 0.6rem;
+            font-weight: 700;
+            font-family: inherit;
+            padding: 8px 0;
+            margin: 0;
+            transition: color 0.12s;
+            box-shadow: none;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            min-height: 56px;
+            border-radius: 10px
         }
-        .item-header { font-weight: bold; font-size: 1rem; margin-bottom: 3px; }
-        .item-stats  { font-size: 0.75rem; color: #aaa; margin-bottom: 8px; line-height: 1.6; }
+
+        .nav-item i {
+            font-size: 1.4rem
+        }
+
+        .nav-item.active {
+            color: var(--accent)
+        }
+
+        .nav-item.active i {
+            filter: drop-shadow(0 0 7px var(--accent))
+        }
+
+        .nav-item:active {
+            transform: none;
+            box-shadow: none;
+            background: rgba(255, 255, 255, 0.04)
+        }
+
+        .upgrade-item {
+            background: rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+            padding: 13px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06)
+        }
+
+        .item-header {
+            font-weight: 800;
+            font-size: 0.98rem;
+            margin-bottom: 3px
+        }
+
+        .item-stats {
+            font-size: 0.75rem;
+            color: #999;
+            margin-bottom: 9px;
+            line-height: 1.7
+        }
 
         .shop-section {
-            font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px;
-            color: #666; margin: 16px 0 8px;
-            padding-bottom: 6px; border-bottom: 2px solid rgba(255,255,255,0.07);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #555;
+            margin: 18px 0 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06)
         }
 
-        /* Sub-tabs inside upgrades */
         .sub-tab-bar {
-            display: flex; gap: 6px; background: rgba(0,0,0,0.4);
-            padding: 6px; border-radius: 10px; margin-bottom: 14px;
+            display: flex;
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.45);
+            padding: 5px;
+            border-radius: 10px;
+            margin-bottom: 14px;
+            flex-wrap: wrap
         }
+
         .sub-tab-btn {
-            flex: 1; background: transparent; border: 2px solid transparent;
-            color: #555; padding: 8px 4px; border-radius: 6px;
-            font-weight: bold; font-size: 0.75rem; margin: 0; box-shadow: none;
-            text-align: center; font-family: inherit;
+            flex: 1;
+            background: transparent;
+            border: 2px solid transparent;
+            color: #444;
+            padding: 9px 4px;
+            border-radius: 7px;
+            font-weight: 700;
+            font-size: 0.72rem;
+            margin: 0;
+            box-shadow: none;
+            text-align: center;
+            font-family: inherit;
+            min-height: 0
         }
+
         .sub-tab-btn.active {
-            background: var(--btn-bg); border-color: var(--btn-border);
-            color: #fff; box-shadow: 0 4px 0 var(--btn-border);
-        }
-        .sub-tab-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--btn-border) !important; }
-        .sub-tab-content { display: none; }
-        .sub-tab-content.active { display: block; }
-
-        /* ===== STAT ROWS ===== */
-        .stat-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 0.85rem;
-        }
-        .stat-row:last-child { border-bottom: none; }
-        .stat-label { color: #aaa; display: flex; align-items: center; gap: 8px; }
-        .stat-val { font-weight: bold; color: var(--accent); }
-
-        /* ===== LOG ===== */
-        #log-panel {
-            position: fixed; bottom: 70px; left: 8px; right: 8px;
-            background: rgba(8,9,12,0.8); backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
-            padding: 8px; height: 86px; overflow-y: hidden;
-            display: flex; flex-direction: column-reverse;
-            font-size: 0.7rem; z-index: 40; pointer-events: none;
-        }
-        .log-entry { margin-bottom: 3px; font-family: monospace; animation: slideIn 0.2s ease-out; }
-        @keyframes slideIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:translateX(0); } }
-
-        /* ===== NOTIFICATIONS ===== */
-        #notification-container {
-            position: fixed; top: 70px; left: 10px;
-            display: flex; flex-direction: column; gap: 8px;
-            z-index: 200; pointer-events: none;
-        }
-        .fish-notif {
-            background: var(--panel); backdrop-filter: blur(10px);
-            border: 2px solid var(--panel-border); border-left-width: 6px;
-            padding: 10px 14px; border-radius: 8px; width: 210px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
-            animation: slideInLeft 0.4s cubic-bezier(0.175,0.885,0.32,1.275) forwards, fadeOutLeft 0.3s 4.5s forwards;
-        }
-        @keyframes slideInLeft {
-            from { transform:translateX(-120%); opacity:0; }
-            to   { transform:translateX(0); opacity:1; }
-        }
-        @keyframes fadeOutLeft {
-            from { transform:translateX(0); opacity:1; }
-            to   { transform:translateX(-120%); opacity:0; }
+            background: var(--btn);
+            border-color: var(--btn-b);
+            color: #fff;
+            box-shadow: 0 3px 0 var(--btn-b)
         }
 
-        /* ===== REELING UI ===== */
-        #reeling-ui {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
-            background: rgba(8,9,12,0.96); backdrop-filter: blur(20px);
-            border: 2px solid rgba(255,255,255,0.15);
-            padding: 22px 20px; border-radius: 14px; text-align: center;
-            z-index: 300; display: none; width: 88%; max-width: 340px;
-            box-shadow: 0 16px 48px rgba(0,0,0,0.8);
+        .sub-tab-btn:active {
+            transform: translateY(2px)
         }
-        #reeling-ui h2 {
-            margin: 0 0 14px; font-size: 1.05rem; color: #fff;
-            text-transform: uppercase; letter-spacing: 2px; font-style: italic;
-        }
-        .catch-progress-container {
-            width: 100%; height: 22px; background: #111;
-            border: 2px solid #333; border-radius: 11px; margin-bottom: 14px; overflow: hidden;
-        }
-        #catch-progress-fill {
-            width: 30%; height: 100%;
-            background: linear-gradient(90deg, #00b0f0, #00ff88); transition: width 0.1s ease-out;
-        }
-        .timing-bar-container {
-            width: 100%; height: 40px; background: #1a1c1e;
-            border: 2px solid #444; border-radius: 8px; overflow: hidden; position: relative;
-        }
-        #timing-target  { position: absolute; height: 100%; background: rgba(74,222,128,0.5); }
-        #timing-perfect { position: absolute; height: 100%; background: rgba(250,204,21,0.92); box-shadow: 0 0 10px rgba(250,204,21,0.7); }
-        #timing-cursor  { position: absolute; width: 7px; height: 100%; background: white; left: 0; box-shadow: 0 0 8px white; border-radius: 3px; transform: translateX(-50%); }
-        #reeling-ui p { font-size: 0.8rem; margin: 10px 0 0; color: #ccc; }
 
-        /* ===== ENCYCLOPEDIA ===== */
-        #encyclopedia-panel {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(6,7,10,0.97); backdrop-filter: blur(20px);
-            z-index: 400; flex-direction: column;
+        .sub-tab-content {
+            display: none
         }
-        .enc-header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 14px 14px; border-bottom: 2px solid rgba(255,255,255,0.1);
-            background: var(--panel); gap: 8px; flex-wrap: wrap;
+
+        .sub-tab-content.active {
+            display: block
         }
-        .enc-header h2 { margin: 0; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; }
-        .enc-controls { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-        .enc-sort-btn {
-            background: transparent; border: 2px solid #333; color: #777;
-            padding: 6px 10px; border-radius: 6px; font-size: 0.72rem; width: auto;
-            margin: 0; box-shadow: none; font-weight: bold; font-family: inherit;
+
+        /* Grid layout for shop items */
+        #rods-list,
+        #upgrades-list,
+        #bait-list,
+        #areas-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
         }
-        .enc-sort-btn.active {
-            background: var(--accent); border-color: var(--accent-hover);
-            color: #fff; box-shadow: 0 3px 0 var(--accent-hover);
+
+        /* Grid layout for encyclopedia */
+        #enc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+            padding: 10px;
         }
-        .enc-close {
-            background: #ef4444; border: 2px solid #b91c1c; box-shadow: 0 4px 0 #b91c1c;
-            color: white; padding: 8px 14px; border-radius: 8px;
-            font-weight: bold; width: auto; margin: 0; font-size: 0.85rem;
+
+        /* Make upgrade items fill grid cells properly */
+        .upgrade-item {
+            margin-bottom: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
-        #enc-grid { overflow-y: auto; flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+
+        /* Ensure buttons stay at bottom of cards */
+        .upgrade-item button {
+            margin-top: auto;
+            margin-bottom: 0;
+        }
+
+        /* Encyclopedia cards in grid */
         .enc-card {
-            background: rgba(0,0,0,0.45); border: 2px solid #334155;
-            border-left-width: 5px; border-radius: 10px; padding: 12px;
-        }
-        .enc-title { font-size: 1.05rem; font-weight: bold; margin-bottom: 4px; }
-        .mut-tag {
-            display: inline-block; padding: 3px 7px; border-radius: 5px;
-            font-size: 0.68rem; font-weight: bold; margin: 2px 3px 2px 0; color: #000;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* ===== MISC ===== */
-        .screen-flash { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:250; opacity:0; transition:opacity 0.08s; }
+        /* Make encyclopedia images responsive */
+        .enc-card img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Save slots grid */
+        #save-slots-panel .panel-body {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .slot-card {
+            background: rgba(0, 0, 0, 0.45);
+            border: 2px solid #1e293b;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .slot-name {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
+
+        .slot-stats {
+            font-size: 0.7rem;
+            color: #888;
+            margin-bottom: 12px;
+        }
+
+        .slot-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .slot-actions button {
+            flex: 1;
+            padding: 8px;
+            font-size: 0.7rem;
+            min-height: 0;
+            text-align: center;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.85rem
+        }
+
+        .stat-row:last-child {
+            border-bottom: none
+        }
+
+        .stat-label {
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .stat-val {
+            font-weight: 800;
+            color: var(--accent)
+        }
+
+        #notification-container {
+            position: fixed;
+            top: 90px;
+            right: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 200;
+            pointer-events: none;
+            max-width: 225px
+        }
+
+        .fish-notif {
+            background: rgba(14, 16, 22, 0.97);
+            backdrop-filter: blur(14px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-left-width: 5px;
+            padding: 11px 14px;
+            border-radius: 12px;
+            width: 215px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
+            animation: slideInR 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, fadeOutR 0.3s 4.6s forwards
+        }
+
+        .fn-name {
+            font-weight: 900;
+            font-size: 1rem;
+            margin-bottom: 3px
+        }
+
+        .fn-muts {
+            margin-bottom: 4px
+        }
+
+        .fn-wt {
+            font-size: 0.74rem;
+            color: #bbb;
+            margin-bottom: 1px
+        }
+
+        .fn-val {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: #facc15
+        }
+
+        @keyframes slideInR {
+            from {
+                transform: translateX(110%);
+                opacity: 0
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1
+            }
+        }
+
+        @keyframes fadeOutR {
+            from {
+                opacity: 1
+            }
+
+            to {
+                transform: translateX(110%);
+                opacity: 0
+            }
+        }
+
+        #toast-container {
+            position: fixed;
+            bottom: 95px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            gap: 5px;
+            z-index: 150;
+            pointer-events: none;
+            width: 92%
+        }
+
+        .game-toast {
+            background: rgba(12, 13, 18, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 22px;
+            padding: 7px 18px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-align: center;
+            max-width: 310px;
+            animation: toastIn 0.22s ease-out forwards, toastOut 0.28s 2.4s forwards
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes toastOut {
+            to {
+                opacity: 0
+            }
+        }
+
+        #reeling-ui {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(6, 7, 11, 0.97);
+            backdrop-filter: blur(22px);
+            border: 2px solid rgba(255, 255, 255, 0.14);
+            padding: 22px 18px;
+            border-radius: 16px;
+            text-align: center;
+            z-index: 300;
+            display: none;
+            width: 90%;
+            max-width: 350px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9)
+        }
+
+        #reeling-ui h2 {
+            margin: 0 0 10px;
+            font-size: 1rem;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-style: italic
+        }
+
+        .catch-prog-wrap {
+            width: 100%;
+            height: 20px;
+            background: #0a0b0e;
+            border: 1.5px solid #2a2c30;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            position: relative
+        }
+
+        #catch-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00b0f0, #00ff88);
+            transition: width 0.1s ease-out
+        }
+
+        .catch-prog-wrap span {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 1px 3px #000
+        }
+
+        .timing-bar-wrap {
+            width: 100%;
+            height: 48px;
+            background: #111316;
+            border: 1.5px solid #333;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative
+        }
+
+        #timing-target {
+            position: absolute;
+            height: 100%;
+            background: rgba(74, 222, 128, 0.45)
+        }
+
+        #timing-perfect {
+            position: absolute;
+            height: 100%;
+            background: rgba(250, 204, 21, 0.9);
+            box-shadow: 0 0 12px rgba(250, 204, 21, 0.6)
+        }
+
+        #timing-cursor {
+            position: absolute;
+            width: 6px;
+            height: 100%;
+            background: #fff;
+            left: 0;
+            box-shadow: 0 0 10px #fff;
+            border-radius: 3px;
+            transform: translateX(-50%)
+        }
+
+        #reeling-ui p {
+            font-size: 0.78rem;
+            margin: 10px 0 0;
+            color: #bbb
+        }
+
+        #fish-preview-reel {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px
+        }
+
+        .fish-chip {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1.5px solid #333;
+            border-radius: 8px;
+            padding: 4px 10px;
+            font-size: 0.72rem;
+            font-weight: 700
+        }
+
+        #encyclopedia-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 6, 9, 0.98);
+            backdrop-filter: blur(22px);
+            z-index: 400;
+            flex-direction: column
+        }
+
+        .enc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px;
+            border-bottom: 1.5px solid rgba(255, 255, 255, 0.08);
+            background: var(--panel);
+            gap: 8px;
+            flex-wrap: wrap
+        }
+
+        .enc-header h2 {
+            margin: 0;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 2px
+        }
+
+        .enc-controls {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            flex-wrap: wrap
+        }
+
+        .enc-sort-btn {
+            background: transparent;
+            border: 1.5px solid #2a2c30;
+            color: #666;
+            padding: 6px 10px;
+            border-radius: 7px;
+            font-size: 0.7rem;
+            width: auto;
+            margin: 0;
+            box-shadow: none;
+            font-weight: 700;
+            font-family: inherit;
+            min-height: 0
+        }
+
+        .enc-sort-btn.active {
+            background: var(--accent);
+            border-color: var(--accent-h);
+            color: #fff;
+            box-shadow: 0 3px 0 var(--accent-h)
+        }
+
+        .enc-close {
+            background: #dc2626;
+            border: 1.5px solid #991b1b;
+            box-shadow: 0 3px 0 #991b1b;
+            color: #fff;
+            padding: 7px 13px;
+            border-radius: 8px;
+            font-weight: 700;
+            width: auto;
+            margin: 0;
+            font-size: 0.82rem;
+            min-height: 0
+        }
+
+        .screen-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 250;
+            opacity: 0;
+            transition: opacity 0.07s
+        }
+
         .notif {
-            position: fixed; pointer-events: none; color: white; font-weight: 900;
-            font-size: 1.3rem; text-shadow: 2px 2px 0 #000, -1px -1px 0 #000;
-            animation: floatUp 1.5s forwards; z-index: 500; text-align: center;
+            position: fixed;
+            pointer-events: none;
+            font-weight: 900;
+            font-size: 1.3rem;
+            text-shadow: 2px 2px 0 #000, -1px -1px 0 #000;
+            animation: floatUp 1.4s forwards;
+            z-index: 500;
+            text-align: center
         }
-        @keyframes floatUp { to { transform: translateY(-100px); opacity: 0; } }
 
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #666; }
+        @keyframes floatUp {
+            to {
+                transform: translateY(-90px);
+                opacity: 0
+            }
+        }
+
+        .combo-popup {
+            position: fixed;
+            left: 50%;
+            top: 38%;
+            transform: translateX(-50%);
+            pointer-events: none;
+            font-weight: 900;
+            font-size: 2rem;
+            text-shadow: 0 0 20px currentColor, 2px 2px 0 #000;
+            animation: comboPop 1.2s forwards;
+            z-index: 510
+        }
+
+        @keyframes comboPop {
+            0% {
+                transform: translateX(-50%) scale(0.5);
+                opacity: 0
+            }
+
+            30% {
+                transform: translateX(-50%) scale(1.2);
+                opacity: 1
+            }
+
+            70% {
+                opacity: 1
+            }
+
+            100% {
+                transform: translateX(-50%) scale(1) translateY(-60px);
+                opacity: 0
+            }
+        }
+
+        #update-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--accent);
+            border-radius: 20px;
+            padding: 20px;
+            z-index: 600;
+            text-align: center;
+            max-width: 90%;
+            width: 320px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #update-notification h3 {
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        #update-notification p {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: #ccc;
+        }
+
+        #update-notification button {
+            margin: 0;
+            text-align: center;
+        }
+
+        ::-webkit-scrollbar {
+            width: 3px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 3px
+        }
+
+        @media (max-width: 600px) {
+
+            #rods-list,
+            #upgrades-list,
+            #bait-list,
+            #areas-list,
+            #enc-grid,
+            #save-slots-panel .panel-body {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+
+            #rods-list,
+            #upgrades-list,
+            #bait-list,
+            #areas-list,
+            #enc-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1025px) {
+
+            #rods-list,
+            #upgrades-list,
+            #bait-list,
+            #areas-list,
+            #enc-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
     </style>
 </head>
+
 <body>
-<div id="app">
-    <div id="canvas-container">
-        <canvas id="gameCanvas"></canvas>
-    </div>
-
-    <!-- Top Bar -->
-    <div id="top-bar">
-        <div>
-            <div class="area-label"><i class="fa-solid fa-location-dot"></i> Area</div>
-            <div class="area-name" id="current-area-name">Peaceful Lake</div>
+    <div id="app">
+        <div id="canvas-container">
+            <canvas id="gameCanvas"></canvas>
+            <div id="tap-zone"></div>
         </div>
-        <div id="money-pill"><i class="fa-solid fa-dollar-sign"></i> <span id="money-display">0</span></div>
-        <button class="btn-dex" onclick="game.toggleEncyclopedia()"><i class="fa-solid fa-book-open"></i> Dex</button>
-    </div>
-
-    <!-- Log -->
-    <div id="log-panel"></div>
-
-    <!-- Notifications -->
-    <div id="notification-container"></div>
-
-    <!-- Reeling UI -->
-    <div id="reeling-ui">
-        <h2 id="reel-message"><i class="fa-solid fa-fish"></i> &nbsp;Fish On!</h2>
-        <div class="catch-progress-container"><div id="catch-progress-fill"></div></div>
-        <div class="timing-bar-container">
-            <div id="timing-target"><div id="timing-perfect"></div></div>
-            <div id="timing-cursor"></div>
-        </div>
-        <p>Tap <span style="color:#4ade80;font-weight:bold;">GREEN</span> or <span style="color:#facc15;font-weight:bold;">GOLD</span> to reel!</p>
-    </div>
-
-    <!-- TAB: PROFILE -->
-    <div id="profile-panel" class="tab-panel">
-        <div class="panel-header"><h3><i class="fa-solid fa-user"></i> &nbsp;Fisherman</h3></div>
-        <div class="panel-body">
-            <div class="upgrade-item" style="margin-bottom:14px;">
-                <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-star"></i> Level</span><span class="stat-val" id="level-display">1</span></div>
-                <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-fish"></i> Total Caught</span><span class="stat-val" id="total-caught-display">0</span></div>
-                <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-ruler-horizontal"></i> Rod</span><span style="font-weight:bold;color:#fff;" id="stat-rod">Bamboo Pole</span></div>
-                <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-anchor"></i> Hooks</span><span class="stat-val" id="stat-hooks">1</span></div>
-                <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-clover"></i> Luck Bonus</span><span class="stat-val" id="stat-luck">0%</span></div>
-                <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-robot"></i> Autofishing</span><span class="stat-val" id="stat-auto">Off</span></div>
-                <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-cloud-sun"></i> Weather</span><span class="stat-val" id="weather-display">Clear</span></div>
+        <div id="top-bar">
+            <div>
+                <div class="area-label"><i class="fa-solid fa-location-dot"></i> Area</div>
+                <div class="area-name" id="current-area-name">🏞️ Peaceful Lake</div>
             </div>
-            <button class="btn-reset" onclick="game.resetGame()"><i class="fa-solid fa-rotate-left"></i> &nbsp;Reset Save</button>
+            <div id="money-pill"><i class="fa-solid fa-coins"></i> <span id="money-display">0</span></div>
+            <button class="btn-dex" onclick="game.toggleEncyclopedia()"><i class="fa-solid fa-book-open"></i> Dex</button>
         </div>
-    </div>
-
-    <!-- TAB: UPGRADES -->
-    <div id="upgrades-panel" class="tab-panel">
-        <div class="panel-header"><h3><i class="fa-solid fa-gears"></i> &nbsp;Upgrades</h3></div>
-        <div class="panel-body">
-            <div class="sub-tab-bar">
-                <button class="sub-tab-btn active" data-sub="rods"><i class="fa-solid fa-ruler-horizontal"></i> Rods</button>
-                <button class="sub-tab-btn" data-sub="skills"><i class="fa-solid fa-chart-line"></i> Skills</button>
-                <button class="sub-tab-btn" data-sub="travel"><i class="fa-solid fa-water"></i> Travel</button>
+        <div id="xp-bar-wrap">
+            <div id="xp-bar-fill" style="width:0%"></div>
+        </div>
+        <div id="level-badge">
+            <i class="fa-solid fa-star"></i> Lv.<span id="level-badge-value">1</span>
+        </div>
+        <div id="weather-banner">☀️ Clear</div>
+        <div id="toast-container"></div>
+        <div id="notification-container"></div>
+        <div id="reeling-ui">
+            <h2><i class="fa-solid fa-fish"></i> Fish On!</h2>
+            <div id="fish-preview-reel"></div>
+            <div class="catch-prog-wrap">
+                <div id="catch-progress-fill"></div>
+                <span id="catch-pct">0%</span>
             </div>
-            <div id="sub-rods"   class="sub-tab-content active"><div id="rods-list"></div></div>
-            <div id="sub-skills" class="sub-tab-content"><div id="upgrades-list"></div></div>
-            <div id="sub-travel" class="sub-tab-content"><div id="areas-list"></div></div>
-        </div>
-    </div>
-
-    <!-- Encyclopedia -->
-    <div id="encyclopedia-panel">
-        <div class="enc-header">
-            <h2><i class="fa-solid fa-book-open"></i> &nbsp;Fish Index</h2>
-            <div class="enc-controls">
-                <button class="enc-sort-btn active" id="sort-mut"  onclick="game.sortEnc('mutation')">Mutation</button>
-                <button class="enc-sort-btn"         id="sort-rare" onclick="game.sortEnc('rarity')">Rarity</button>
-                <button class="enc-sort-btn"         id="sort-val"  onclick="game.sortEnc('value')">Value</button>
-                <button class="enc-close"            onclick="game.toggleEncyclopedia()"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-        </div>
-        <div id="enc-grid"></div>
-    </div>
-
-    <div class="screen-flash" id="flash-overlay"></div>
-
-    <!-- Bottom Nav -->
-    <div id="bottom-nav">
-        <button class="nav-item" data-tab="profile">
-            <i class="fa-solid fa-user"></i><span>Profile</span>
-        </button>
-        <button class="nav-item active" data-tab="game">
-            <i class="fa-solid fa-fish-fins"></i><span>Fish</span>
-        </button>
-        <button class="nav-item" data-tab="upgrades">
-            <i class="fa-solid fa-gears"></i><span>Upgrades</span>
-        </button>
-    </div>
-</div>
-
-<script>
-// ================================================================
-//  CONFIG
-// ================================================================
-const CONFIG = {
-    rarities: {
-        COMMON:    {index:0, color:'#cbd5e1', weight:60,  diffMult:1   },
-        UNCOMMON:  {index:1, color:'#4ade80', weight:25,  diffMult:1.5 },
-        RARE:      {index:2, color:'#60a5fa', weight:10,  diffMult:2.5 },
-        EPIC:      {index:3, color:'#c084fc', weight:4,   diffMult:4   },
-        LEGENDARY: {index:4, color:'#fbbf24', weight:1,   diffMult:8   }
-    },
-    areas: [
-        {name:"Peaceful Lake", minLevel:1,  unlockCost:0,     fishMult:1,  color:"#38bdf8", diffMult:1  },
-        {name:"Rapid River",   minLevel:5,  unlockCost:500,   fishMult:2.5,color:"#1d4ed8", diffMult:1.5},
-        {name:"Sunken Ocean",  minLevel:15, unlockCost:5000,  fishMult:8,  color:"#1e3a8a", diffMult:2.5},
-        {name:"The Abyss",     minLevel:30, unlockCost:50000, fishMult:25, color:"#0f172a", diffMult:4  }
-    ],
-    rods: [
-        {name:"Bamboo Pole",    hooks:1, maxWeight:15,    luckBonus:0,  cost:50,     linger:3000},
-        {name:"Sturdy Rod",     hooks:1, maxWeight:100,   luckBonus:5,  cost:500,    linger:3500},
-        {name:"Twin-Line Rod",  hooks:2, maxWeight:50,    luckBonus:10, cost:2500,   linger:4000},
-        {name:"Heavy Duty Rod", hooks:1, maxWeight:1000,  luckBonus:20, cost:8000,   linger:4500},
-        {name:"Trident Reeler", hooks:3, maxWeight:250,   luckBonus:30, cost:25000,  linger:5000},
-        {name:"Leviathan Tamer",hooks:2, maxWeight:25000, luckBonus:50, cost:100000, linger:6000}
-    ],
-    fishData: [
-        {name:"Minnow",       rarity:"COMMON",    area:0, baseVal:5,     weightRange:[0.1,0.5]  },
-        {name:"Perch",        rarity:"COMMON",    area:0, baseVal:12,    weightRange:[0.5,2]    },
-        {name:"Bass",         rarity:"UNCOMMON",  area:0, baseVal:35,    weightRange:[2,8]      },
-        {name:"Carp",         rarity:"RARE",      area:0, baseVal:80,    weightRange:[5,15]     },
-        {name:"Rainbow Trout",rarity:"UNCOMMON",  area:1, baseVal:50,    weightRange:[1,5]      },
-        {name:"Salmon",       rarity:"RARE",      area:1, baseVal:150,   weightRange:[5,25]     },
-        {name:"Sturgeon",     rarity:"EPIC",      area:1, baseVal:600,   weightRange:[20,100]   },
-        {name:"Tuna",         rarity:"UNCOMMON",  area:2, baseVal:300,   weightRange:[50,200]   },
-        {name:"Marlin",       rarity:"EPIC",      area:2, baseVal:1500,  weightRange:[100,500]  },
-        {name:"Great White",  rarity:"LEGENDARY", area:2, baseVal:5000,  weightRange:[1000,3000]},
-        {name:"Anglerfish",   rarity:"RARE",      area:3, baseVal:2000,  weightRange:[2,10]     },
-        {name:"Giant Squid",  rarity:"EPIC",      area:3, baseVal:8000,  weightRange:[500,1000] },
-        {name:"The Kraken",   rarity:"LEGENDARY", area:3, baseVal:50000, weightRange:[5000,20000]}
-    ]
-};
-
-const MUTATION_CLASSES = {
-    Common:   {id:0, color:'#cbd5e1', mult:1.2,   weight:1000},
-    Uncommon: {id:1, color:'#4ade80', mult:1.5,   weight:400 },
-    Rare:     {id:2, color:'#60a5fa', mult:2.5,   weight:150 },
-    UltraRare:{id:3, color:'#f43f5e', mult:5.0,   weight:50  },
-    Legendary:{id:4, color:'#fbbf24', mult:15.0,  weight:10  },
-    Mythical: {id:5, color:'#c084fc', mult:40.0,  weight:3   },
-    Divine:   {id:6, color:'#facc15', mult:150.0, weight:1   },
-    Secret:   {id:7, color:'#ffffff', mult:1000.0,weight:0.1 }
-};
-
-const MUTATIONS = [
-    {name:"Plump",class:"Common"},{name:"Muddy",class:"Common"},{name:"Swift",class:"Common"},
-    {name:"Lazy",class:"Common"},{name:"Spotted",class:"Common"},{name:"Striped",class:"Common"},
-    {name:"Scaly",class:"Common"},{name:"Noisy",class:"Common"},{name:"Feisty",class:"Common"},
-    {name:"Hungry",class:"Common"},{name:"Shiny",class:"Uncommon"},{name:"Heavy",class:"Uncommon"},
-    {name:"Agile",class:"Uncommon"},{name:"Armored",class:"Uncommon"},{name:"Stubborn",class:"Uncommon"},
-    {name:"Long",class:"Uncommon"},{name:"Camouflaged",class:"Uncommon"},{name:"Vicious",class:"Uncommon"},
-    {name:"Spiky",class:"Uncommon"},{name:"Sleek",class:"Uncommon"},{name:"Giant",class:"Rare"},
-    {name:"Albino",class:"Rare"},{name:"Venomous",class:"Rare"},{name:"Electric",class:"Rare"},
-    {name:"Metallic",class:"Rare"},{name:"Crystalline",class:"Rare"},{name:"Ghostly",class:"Rare"},
-    {name:"Phantom",class:"Rare"},{name:"Luminous",class:"Rare"},{name:"Savage",class:"Rare"},
-    {name:"Radioactive",class:"UltraRare"},{name:"Prehistoric",class:"UltraRare"},{name:"Neon",class:"UltraRare"},
-    {name:"Infernal",class:"UltraRare"},{name:"Glacial",class:"UltraRare"},{name:"Toxic",class:"UltraRare"},
-    {name:"Corrupted",class:"UltraRare"},{name:"Symbiotic",class:"UltraRare"},{name:"Golden",class:"Legendary"},
-    {name:"Diamond",class:"Legendary"},{name:"Kraken-Touched",class:"Legendary"},{name:"Leviathan-Blooded",class:"Legendary"},
-    {name:"Royal",class:"Legendary"},{name:"Spectral",class:"Legendary"},{name:"Void-Touched",class:"Mythical"},
-    {name:"Ethereal",class:"Mythical"},{name:"Astral",class:"Mythical"},{name:"Quantum",class:"Mythical"},
-    {name:"Celestial",class:"Divine"},{name:"God-King",class:"Divine"},
-    {name:"???̸̛",class:"Secret"},{name:"Glitched",class:"Secret"}
-];
-
-// ================================================================
-//  GAME
-// ================================================================
-class Game {
-    constructor() {
-        this.canvas = document.getElementById('gameCanvas');
-        this.ctx = this.canvas.getContext('2d');
-        this.state = {
-            money:0, totalCaught:0, level:1, currentArea:0,
-            unlockedAreas:[0], encyclopedia:[],
-            ownedRods:[0], equippedRod:0,
-            upgrades:{line:0,reel:0,luck:0,auto:0},
-            weather:'Clear'
-        };
-        this.fishingState='IDLE';
-        this.hooks=[]; this.activeFishes=[];
-        this.yankedFishes=[]; this.bittenHooksPositions=[];
-        this.miniGame={cursor:0,speed:2,direction:1,targetStart:0,targetWidth:0,
-            perfectStart:0,perfectWidth:0,progress:0,maxProgress:100,
-            drainRate:5,freezeDecayTimer:0,zenTimer:0};
-        this.particles=[]; this.lastTime=0; this.autoFisherTimer=0;
-        this.encSortMode='mutation'; this.encOpen=false;
-        this.init();
-    }
-
-    init() {
-        this.load();
-        this.resize();
-        window.addEventListener('resize', () => this.resize());
-
-        window.addEventListener('keydown', (e) => {
-            if (e.code==='Space' && !this.encOpen) { e.preventDefault(); if(!e.repeat) this.handleAction(); }
-        });
-        this.canvas.addEventListener('pointerdown', () => { if(!this.encOpen) this.handleAction(); });
-
-        // Bottom nav tabs
-        document.querySelectorAll('.nav-item').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-                const tab = btn.dataset.tab;
-                if (tab === 'profile')   document.getElementById('profile-panel').classList.add('active');
-                if (tab === 'upgrades')  document.getElementById('upgrades-panel').classList.add('active');
-                // 'game' → no panel, canvas shows
-            });
-        });
-
-        // Sub-tabs
-        document.querySelectorAll('.sub-tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.sub-tab-content').forEach(c => c.classList.remove('active'));
-                btn.classList.add('active');
-                document.getElementById('sub-'+btn.dataset.sub).classList.add('active');
-            });
-        });
-
-        this.renderShop();
-        this.updateUI();
-        requestAnimationFrame((t) => this.loop(t));
-        setInterval(() => this.save(), 5000);
-
-        const weathers = ['Clear','Cloudy','Rainy','Foggy','Stormy'];
-        setInterval(() => { this.state.weather = weathers[Math.floor(Math.random()*weathers.length)]; this.updateUI(); }, 60000);
-    }
-
-    resize() { this.canvas.width = this.canvas.offsetWidth; this.canvas.height = this.canvas.offsetHeight; }
-
-    handleAction() {
-        if (this.fishingState==='IDLE') {
-            this.startCasting();
-        } else if (this.fishingState==='WAITING' || this.fishingState==='BITE') {
-            const bitten = this.hooks.filter(h=>h.state==='BITE');
-            const empty  = this.hooks.filter(h=>h.state==='WAITING'||h.state==='CASTING');
-            this.bittenHooksPositions = bitten.map(h=>({x:h.x,y:h.y}));
-            if (bitten.length > 0) {
-                empty.forEach(h=>{h.state='ESCAPED';this.spawnSplash(h.x,h.y,5);});
-                if (empty.length>0) this.log(`Pulled early: ${empty.length} hook(s) empty!`,"#94a3b8");
-                this.startMiniGame(bitten.length);
-            } else {
-                this.fishingState='IDLE';
-                this.hooks.forEach(h=>{h.state='ESCAPED';this.spawnSplash(h.x,h.y,5);});
-                this.log("Pulled too early! Scared the fish away.","#f87171");
-            }
-        } else if (this.fishingState==='REELING') {
-            this.checkMiniGame();
-        }
-    }
-
-    startCasting() {
-        this.fishingState='CASTING';
-        const rod = CONFIG.rods[this.state.equippedRod];
-        this.hooks=[];
-        const spacing=40, startX=(this.canvas.width/2)-((rod.hooks-1)*spacing/2);
-        for (let i=0; i<rod.hooks; i++) {
-            let bt = (3000+Math.random()*5000)/(1+this.state.upgrades.reel*0.2);
-            if (this.state.weather==='Rainy') bt*=0.7;
-            this.hooks.push({
-                state:'CASTING',
-                x: startX+(i*spacing)+(Math.random()*20-10), y:-50,
-                targetY: this.canvas.height*0.7+(Math.random()*50),
-                offset:0, biteTimer:bt, lingerTime:rod.linger, biteWindow:0
-            });
-        }
-        setTimeout(()=>{ if(this.fishingState==='CASTING'){this.fishingState='WAITING';this.hooks.forEach(h=>h.state='WAITING');} }, 800);
-    }
-
-    rollFishData() {
-        const rod = CONFIG.rods[this.state.equippedRod];
-        const pool = CONFIG.fishData.filter(f=>f.area===this.state.currentArea&&f.weightRange[0]<=rod.maxWeight);
-        if (!pool.length) return null;
-        const luck = rod.luckBonus+(this.state.upgrades.luck*5);
-        const rolls = pool.map(f=>({fish:f,weight:f.rarity!=='COMMON'?CONFIG.rarities[f.rarity].weight+luck:CONFIG.rarities[f.rarity].weight}));
-        let r=Math.random()*rolls.reduce((a,b)=>a+b.weight,0), sel=rolls[0].fish;
-        for (let x of rolls){if(r<x.weight){sel=x.fish;break;}r-=x.weight;}
-        let w=parseFloat((Math.min(rod.maxWeight,sel.weightRange[0]+Math.random()*(sel.weightRange[1]-sel.weightRange[0]))).toFixed(2));
-        let base=Math.floor(sel.baseVal*CONFIG.areas[this.state.currentArea].fishMult*(w/sel.weightRange[0]));
-        const rd=CONFIG.rarities[sel.rarity];
-        let mc=0.15-(rd.index*0.05), muts=[], mm=1;
-        while (Math.random()<mc&&muts.length<5) {
-            let tw=MUTATIONS.reduce((s,m)=>s+MUTATION_CLASSES[m.class].weight,0);
-            let mr=Math.random()*tw;
-            let sm=MUTATIONS.find(m=>(mr-=MUTATION_CLASSES[m.class].weight)<0)||MUTATIONS[0];
-            if (!muts.find(x=>x.name===sm.name)){muts.push(sm);mm*=MUTATION_CLASSES[sm.class].mult;}
-            mc*=0.1;
-        }
-        return {template:sel,weight:w,mutations:muts,value:Math.floor(base*mm),diffMult:rd.diffMult*CONFIG.areas[this.state.currentArea].diffMult};
-    }
-
-    startMiniGame(hookCount) {
-        this.fishingState='REELING';
-        this.activeFishes=Array.from({length:hookCount},()=>this.rollFishData());
-        document.getElementById('reeling-ui').style.display='block';
-        const diff=Math.max(...this.activeFishes.map(f=>f?f.diffMult:1))+((hookCount-1)*1.5);
-        const ll=this.state.upgrades.line;
-        this.miniGame.maxProgress=100+(diff*15);
-        this.miniGame.progress=this.miniGame.maxProgress*0.25;
-        this.miniGame.drainRate=Math.max(1.5,(diff*5)-(ll*0.5));
-        this.miniGame.freezeDecayTimer=0; this.miniGame.zenTimer=2.0;
-        this.miniGame.targetWidth=Math.min(80,Math.max(6,30-(diff*2.5)+(ll*4)));
-        this.miniGame.targetStart=10+Math.random()*(80-this.miniGame.targetWidth);
-        this.miniGame.perfectWidth=Math.max(2,this.miniGame.targetWidth*0.3);
-        this.miniGame.perfectStart=this.miniGame.targetStart+(this.miniGame.targetWidth/2)-(this.miniGame.perfectWidth/2);
-        this.miniGame.cursor=0; this.miniGame.direction=1;
-        this.miniGame.speed=Math.min(6,Math.max(0.5,2.5+(diff*0.8)-(ll*0.2)));
-        document.getElementById('timing-target').style.left=this.miniGame.targetStart+'%';
-        document.getElementById('timing-target').style.width=this.miniGame.targetWidth+'%';
-        document.getElementById('timing-perfect').style.left=((this.miniGame.perfectStart-this.miniGame.targetStart)/this.miniGame.targetWidth*100)+'%';
-        document.getElementById('timing-perfect').style.width=(this.miniGame.perfectWidth/this.miniGame.targetWidth*100)+'%';
-    }
-
-    checkMiniGame() {
-        const pos=this.miniGame.cursor, ll=this.state.upgrades.line, g=2.5;
-        const inGood=pos>=(this.miniGame.targetStart-g)&&pos<=(this.miniGame.targetStart+this.miniGame.targetWidth+g);
-        const inPerf=pos>=(this.miniGame.perfectStart-g/2)&&pos<=(this.miniGame.perfectStart+this.miniGame.perfectWidth+g/2);
-        const cx=this.canvas.width/2+(Math.random()*40-20), cy=this.canvas.height/2-60;
-        if (inPerf) {
-            this.miniGame.progress+=35+(ll*5); this.miniGame.freezeDecayTimer=1.0;
-            this.flashScreen('rgba(250,204,21,0.4)'); this.createNotif("PERFECT!",cx,cy,"#facc15");
-        } else if (inGood) {
-            this.miniGame.progress+=15+(ll*2.5); this.miniGame.freezeDecayTimer=1.0;
-            this.createNotif("Good!",cx,cy,"#4ade80");
-        } else {
-            this.miniGame.progress-=25; this.flashScreen('rgba(239,68,68,0.3)'); this.createNotif("Miss!",cx,cy,"#ef4444");
-        }
-        this.miniGame.targetStart=10+Math.random()*(80-this.miniGame.targetWidth);
-        this.miniGame.perfectStart=this.miniGame.targetStart+(this.miniGame.targetWidth/2)-(this.miniGame.perfectWidth/2);
-        document.getElementById('timing-target').style.left=this.miniGame.targetStart+'%';
-        document.getElementById('timing-perfect').style.left=((this.miniGame.perfectStart-this.miniGame.targetStart)/this.miniGame.targetWidth*100)+'%';
-        if (this.miniGame.progress>=this.miniGame.maxProgress) this.catchFish();
-        else if (this.miniGame.progress<=0) this.escapeFish();
-    }
-
-    flashScreen(color) {
-        const f=document.getElementById('flash-overlay');
-        f.style.background=color; f.style.opacity='1'; setTimeout(()=>f.style.opacity='0',100);
-    }
-
-    escapeFish() {
-        this.log("The fish snapped the line and escaped...","#ef4444");
-        document.getElementById('reeling-ui').style.display='none';
-        this.fishingState='IDLE'; this.activeFishes=[];
-    }
-
-    drawFishEntity(ctx,x,y,size,fishData,life=1) {
-        ctx.save(); ctx.translate(x,y);
-        let rarity=fishData.template?fishData.template.rarity:fishData.fishRarity;
-        let color=CONFIG.rarities[rarity].color, muts=fishData.mutations||[];
-        let isGolden=muts.some(m=>m.name==="Golden"), isGhostly=muts.some(m=>m.name==="Ghostly"||m.name==="Phantom");
-        let isPlump=muts.some(m=>m.name==="Plump"), isLong=muts.some(m=>m.name==="Long");
-        let isSpiky=muts.some(m=>m.name==="Spiky"||m.name==="Savage");
-        if(isGolden) color='#fbbf24';
-        let hmc=null,hmi=-1;
-        muts.forEach(m=>{let d=MUTATION_CLASSES[m.class];if(d&&d.id>hmi){hmi=d.id;hmc=d.color;}});
-        if(hmc){ctx.shadowBlur=20;ctx.shadowColor=hmc;}
-        ctx.globalAlpha=isGhostly?0.4*life:Math.max(0,life);
-        let bw=size,bh=size*0.6;
-        if(isPlump) bh*=1.4; if(isLong) bw*=1.4;
-        ctx.fillStyle=color;
-        ctx.beginPath();ctx.moveTo(-bw*0.5,0);ctx.lineTo(-bw*1.6,-bh*0.8);ctx.lineTo(-bw*1.6,bh*0.8);ctx.fill();
-        if(isSpiky){
-            ctx.beginPath();
-            for(let i=-bw*0.6;i<bw*0.6;i+=bw*0.4){ctx.moveTo(i,-bh*0.5);ctx.lineTo(i+bw*0.2,-bh*1.5);ctx.lineTo(i+bw*0.4,-bh*0.5);}
-            ctx.fill();
-        }
-        ctx.beginPath();ctx.ellipse(0,0,bw,bh,0,0,Math.PI*2);ctx.fill();
-        ctx.shadowBlur=0;ctx.fillStyle='white';ctx.beginPath();ctx.arc(bw*0.4,-bh*0.2,size*0.15,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='black';ctx.beginPath();ctx.arc(bw*0.45,-bh*0.2,size*0.08,0,Math.PI*2);ctx.fill();
-        ctx.restore();
-    }
-
-    showFishNotification(fish,finalValue) {
-        const c=document.getElementById('notification-container');
-        const n=document.createElement('div'); n.className='fish-notif';
-        let hc=CONFIG.rarities[fish.template.rarity].color;
-        fish.mutations.forEach(m=>{if(MUTATION_CLASSES[m.class].id>-1) hc=MUTATION_CLASSES[m.class].color;});
-        n.style.borderLeftColor=hc;
-        let mh=fish.mutations.map(m=>`<span class="mut-tag" style="background:${MUTATION_CLASSES[m.class].color}">${m.name}</span>`).join(' ');
-        n.innerHTML=`<div style="font-weight:bold;font-size:1rem;color:${hc};margin-bottom:4px">${fish.template.name}</div>
-            ${mh?`<div style="margin-bottom:4px">${mh}</div>`:''}
-            <div style="font-size:0.78rem;color:#ccc">⚖️ ${fish.weight}kg</div>
-            <div style="font-size:0.88rem;font-weight:bold;color:#facc15;margin-top:4px">💵 +$${finalValue.toLocaleString()}</div>`;
-        c.appendChild(n); setTimeout(()=>{if(n.parentNode)n.remove();},5000);
-    }
-
-    catchFish() {
-        let tot=0;
-        this.activeFishes.forEach((f,i)=>{
-            if(!f) return;
-            let v=f.value; if(Math.random()*100<(this.state.upgrades.luck*2)) v*=2;
-            tot+=v; this.state.totalCaught++;
-            let fn=f.mutations.map(m=>m.name).join(" ")+(f.mutations.length?" ":"")+f.template.name;
-            this.showFishNotification(f,v);
-            let sx=this.canvas.width/2, sy=this.canvas.height*0.8;
-            if(this.bittenHooksPositions&&this.bittenHooksPositions[i]) sx=this.bittenHooksPositions[i].x;
-            let vs=Math.min(120,15+Math.sqrt(f.weight)*3);
-            this.yankedFishes.push({x:sx,y:sy,vx:(Math.random()-0.5)*8,vy:-8-Math.random()*10,
-                fishData:f,life:1.0,size:vs,rotation:(Math.random()-0.5)*0.5,rotSpeed:(Math.random()-0.5)*0.1});
-            this.log(`Caught: ${fn} (${f.weight}kg) - $${v}`,CONFIG.rarities[f.template.rarity].color);
-            this.addToEncyclopedia(f,fn,v);
-        });
-        this.state.money+=tot;
-        if(this.state.totalCaught%10===0){this.state.level++;this.createNotif("LEVEL UP!",this.canvas.width/2,this.canvas.height/3,"#4ade80");}
-        if(this.activeFishes.length>1) this.createNotif(`MULTI CATCH! x${this.activeFishes.length}`,this.canvas.width/2,this.canvas.height/2+50,"#38bdf8");
-        this.updateUI(); this.renderShop();
-        this.hooks.forEach(h=>this.spawnSplash(h.x,h.y,15));
-        document.getElementById('reeling-ui').style.display='none';
-        this.fishingState='IDLE'; this.activeFishes=[];
-    }
-
-    addToEncyclopedia(fd,fn,vc) {
-        const id=`${fd.template.name}_${fd.mutations.map(m=>m.name).sort().join("_")}`;
-        let ex=this.state.encyclopedia.find(e=>e.id===id);
-        if(!ex){
-            this.state.encyclopedia.push({id,name:fn,baseFishName:fd.template.name,fishRarity:fd.template.rarity,
-                mutations:fd.mutations,maxWeight:fd.weight,maxValue:vc,
-                areaCaught:CONFIG.areas[this.state.currentArea].name,count:1});
-        } else {
-            ex.count++;
-            if(fd.weight>ex.maxWeight) ex.maxWeight=fd.weight;
-            if(vc>ex.maxValue) ex.maxValue=vc;
-        }
-        if(this.encOpen) this.renderEncyclopedia();
-    }
-
-    toggleEncyclopedia() {
-        this.encOpen=!this.encOpen;
-        document.getElementById('encyclopedia-panel').style.display=this.encOpen?'flex':'none';
-        if(this.encOpen) this.renderEncyclopedia();
-    }
-
-    sortEnc(mode) {
-        this.encSortMode=mode;
-        document.querySelectorAll('.enc-sort-btn').forEach(b=>b.classList.remove('active'));
-        ({mutation:'sort-mut',rarity:'sort-rare',value:'sort-val'})[mode];
-        document.getElementById({mutation:'sort-mut',rarity:'sort-rare',value:'sort-val'}[mode]).classList.add('active');
-        this.renderEncyclopedia();
-    }
-
-    renderEncyclopedia() {
-        const grid=document.getElementById('enc-grid'); grid.innerHTML='';
-        let list=[...this.state.encyclopedia].sort((a,b)=>{
-            if(this.encSortMode==='mutation'){
-                let am=a.mutations.length>0?Math.max(...a.mutations.map(m=>MUTATION_CLASSES[m.class].id)):-1;
-                let bm=b.mutations.length>0?Math.max(...b.mutations.map(m=>MUTATION_CLASSES[m.class].id)):-1;
-                return am!==bm?bm-am:b.maxValue-a.maxValue;
-            } else if(this.encSortMode==='rarity'){
-                let ar=CONFIG.rarities[a.fishRarity].index,br=CONFIG.rarities[b.fishRarity].index;
-                return ar!==br?br-ar:b.maxValue-a.maxValue;
-            } else return b.maxValue-a.maxValue;
-        });
-        list.forEach(item=>{
-            let bc=CONFIG.rarities[item.fishRarity].color;
-            item.mutations.forEach(m=>{if(MUTATION_CLASSES[m.class].id>-1)bc=MUTATION_CLASSES[m.class].color;});
-            const tc=document.createElement('canvas'); tc.width=160; tc.height=100;
-            const tx=tc.getContext('2d');
-            let ds=Math.min(30,15+Math.sqrt(item.maxWeight)*2);
-            this.drawFishEntity(tx,80,50,ds,item,1.0);
-            grid.innerHTML+=`
-            <div class="enc-card" style="border-color:${bc};box-shadow:0 4px 12px ${bc}33">
-                <div class="enc-title" style="color:${bc}">${item.name}</div>
-                <img src="${tc.toDataURL()}" style="display:block;margin:8px auto;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.5))">
-                <div>${item.mutations.map(m=>`<span class="mut-tag" style="background:${MUTATION_CLASSES[m.class].color}">${m.name}</span>`).join('')}</div>
-                <div style="font-size:0.78rem;color:#aaa;margin-top:6px">Max Weight: ${item.maxWeight}kg</div>
-                <div style="font-size:0.78rem;color:#aaa">Max Value: <span style="color:#facc15">$${item.maxValue.toLocaleString()}</span></div>
-                <div style="font-size:0.78rem;color:#aaa">Caught: ${item.count}x in ${item.areaCaught}</div>
-            </div>`;
-        });
-        if(!list.length) grid.innerHTML='<div style="color:#555;font-style:italic;padding:20px">Catch some fish to fill your index!</div>';
-    }
-
-    updateUI() {
-        document.getElementById('money-display').innerText=Math.floor(this.state.money).toLocaleString();
-        document.getElementById('current-area-name').innerText=CONFIG.areas[this.state.currentArea].name;
-        document.getElementById('level-display').innerText=this.state.level;
-        document.getElementById('total-caught-display').innerText=this.state.totalCaught;
-        const rod=CONFIG.rods[this.state.equippedRod];
-        document.getElementById('stat-rod').innerText=rod.name;
-        document.getElementById('stat-hooks').innerText=rod.hooks;
-        document.getElementById('stat-luck').innerText=`+${rod.luckBonus+(this.state.upgrades.luck*5)}%`;
-        document.getElementById('stat-auto').innerText=this.state.upgrades.auto>0?`Level ${this.state.upgrades.auto}`:'Off';
-        document.getElementById('weather-display').innerText=this.state.weather;
-    }
-
-    renderShop() {
-        // --- RODS ---
-        let rh='';
-        CONFIG.rods.forEach((rod,i)=>{
-            const owned=this.state.ownedRods.includes(i), eqd=this.state.equippedRod===i, af=this.state.money>=rod.cost;
-            rh+=`<div class="upgrade-item">
-                <div class="item-header" style="color:${eqd?'var(--accent)':'#fff'}">${rod.name}${eqd?' <span style="font-size:0.68rem;color:var(--accent);font-weight:normal;">[EQUIPPED]</span>':''}</div>
-                <div class="item-stats">
-                    <i class="fa-solid fa-anchor" style="width:14px"></i> ${rod.hooks} hooks &nbsp;·&nbsp;
-                    <i class="fa-solid fa-weight-hanging" style="width:14px"></i> ${rod.maxWeight>=1000?rod.maxWeight/1000+'t':rod.maxWeight+'kg'}<br>
-                    <i class="fa-regular fa-clock" style="width:14px"></i> ${rod.linger/1000}s linger &nbsp;·&nbsp;
-                    <i class="fa-solid fa-clover" style="width:14px"></i> +${rod.luckBonus}% luck
+            <div class="timing-bar-wrap">
+                <div id="timing-target">
+                    <div id="timing-perfect"></div>
                 </div>
-                ${eqd?`<button class="btn-equipped" disabled><i class="fa-solid fa-check"></i> &nbsp;Equipped</button>`
-                    :owned?`<button class="btn-equip" onclick="game.equipRod(${i})"><i class="fa-solid fa-rotate"></i> &nbsp;Equip Rod</button>`
-                    :`<button class="btn-buy" ${!af?'disabled':''} onclick="game.buyRod(${i},${rod.cost})"><i class="fa-solid fa-cart-shopping"></i> &nbsp;Buy: $${rod.cost.toLocaleString()}</button>`}
-            </div>`;
-        });
-        document.getElementById('rods-list').innerHTML=rh;
+                <div id="timing-cursor"></div>
+            </div>
+            <p>Tap <span style="color:#4ade80;font-weight:800">GREEN</span> or <span style="color:#facc15;font-weight:800">GOLD</span> to reel!</p>
+        </div>
+        <div id="profile-panel" class="tab-panel">
+            <div class="panel-header">
+                <h3><i class="fa-solid fa-id-card"></i> &nbsp;Fisher Profile</h3>
+            </div>
+            <div class="panel-body">
+                <div class="upgrade-item" style="margin-bottom:14px">
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-star"></i> Level</span><span class="stat-val" id="level-display">1</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-fish"></i> Total Caught</span><span class="stat-val" id="total-caught-display">0</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-money-bill-wave"></i> Total Earned</span><span class="stat-val" id="total-earned-display">$0</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-fire"></i> Best Combo</span><span class="stat-val" id="best-combo-display">0x</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-ruler-horizontal"></i> Rod</span><span style="font-weight:800;color:#fff" id="stat-rod">Bamboo</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-anchor"></i> Hooks</span><span class="stat-val" id="stat-hooks">1</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-clover"></i> Luck Bonus</span><span class="stat-val" id="stat-luck">0%</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-robot"></i> Auto Fisher</span><span class="stat-val" id="stat-auto">Off</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-cloud-sun-rain"></i> Weather</span><span class="stat-val" id="weather-display">Clear</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-bolt"></i> Effect</span><span style="font-size:0.75rem;color:#aaa;text-align:right;max-width:55%" id="weather-effect-display">—</span></div>
+                </div>
+                <button class="btn-reset" onclick="game.showSaveSlots()"><i class="fa-solid fa-floppy-disk"></i> &nbsp;Save Slots</button>
+                <button class="btn-reset" style="margin-top:8px;border-color:#facc15;color:#facc15" onclick="game.resetGame()"><i class="fa-solid fa-rotate-left"></i> &nbsp;Reset Current Save</button>
+            </div>
+        </div>
+        <div id="upgrades-panel" class="tab-panel">
+            <div class="panel-header">
+                <h3><i class="fa-solid fa-store"></i> &nbsp;Shop</h3>
+            </div>
+            <div class="panel-body">
+                <div class="sub-tab-bar">
+                    <button class="sub-tab-btn active" data-sub="rods"><i class="fa-solid fa-ruler-horizontal"></i> Rods</button>
+                    <button class="sub-tab-btn" data-sub="skills"><i class="fa-solid fa-chart-line"></i> Skills</button>
+                    <button class="sub-tab-btn" data-sub="bait"><i class="fa-solid fa-worm"></i> Bait</button>
+                    <button class="sub-tab-btn" data-sub="travel"><i class="fa-solid fa-water"></i> Areas</button>
+                </div>
+                <div id="sub-rods" class="sub-tab-content active">
+                    <div id="rods-list"></div>
+                </div>
+                <div id="sub-skills" class="sub-tab-content">
+                    <div id="upgrades-list"></div>
+                </div>
+                <div id="sub-bait" class="sub-tab-content">
+                    <div id="bait-list"></div>
+                </div>
+                <div id="sub-travel" class="sub-tab-content">
+                    <div id="areas-list"></div>
+                </div>
+            </div>
+        </div>
+        <div id="encyclopedia-panel">
+            <div class="enc-header">
+                <h2><i class="fa-solid fa-book-open"></i> &nbsp;Fish Index</h2>
+                <div class="enc-controls">
+                    <button class="enc-sort-btn active" id="sort-mut" onclick="game.sortEnc('mutation')">Mut</button>
+                    <button class="enc-sort-btn" id="sort-rare" onclick="game.sortEnc('rarity')">Rarity</button>
+                    <button class="enc-sort-btn" id="sort-val" onclick="game.sortEnc('value')">Value</button>
+                    <button class="enc-close" onclick="game.toggleEncyclopedia()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            <div id="enc-grid"></div>
+        </div>
+        <div id="save-slots-panel" class="tab-panel">
+            <div class="panel-header">
+                <h3><i class="fa-solid fa-floppy-disk"></i> &nbsp;Save Slots</h3>
+            </div>
+            <div class="panel-body" id="save-slots-list"></div>
+        </div>
+        <div id="update-notification">
+            <h3><i class="fa-solid fa-circle-info"></i> Balance Update!</h3>
+            <p>Hey, we notice you've been playing since before the Balancing Update.</p>
+            <p>You may keep the levels you earned but we do recommend playing on a new save for the best experience!</p>
+            <button class="btn-buy" onclick="game.dismissUpdateNotification()">Continue with current save</button>
+            <button class="btn-equip" onclick="game.showSaveSlots()">Start a new save</button>
+        </div>
+        <div class="screen-flash" id="flash-overlay"></div>
+        <div id="bottom-nav">
+            <button class="nav-item" data-tab="profile"><i class="fa-solid fa-id-card"></i><span>Profile</span></button>
+            <button class="nav-item active" data-tab="game"><i class="fa-solid fa-fish-fins"></i><span>Fish</span></button>
+            <button class="nav-item" data-tab="upgrades"><i class="fa-solid fa-store"></i><span>Shop</span></button>
+        </div>
+    </div>
 
-        // --- SKILLS ---
-        const UPGS=[
-            {id:'line', name:'Braided Line',    desc:'Larger green catch zones',  icon:'fa-solid fa-rope',       base:100 },
-            {id:'reel', name:'High-Speed Reel', desc:'Faster fish bites',         icon:'fa-solid fa-gear',       base:150 },
-            {id:'luck', name:'Shiny Lure',      desc:'More critical catches',     icon:'fa-solid fa-star',       base:200 },
-            {id:'auto', name:'Fishing Net',     desc:'Passive money income',      icon:'fa-solid fa-fish-fins',  base:1000}
+    <script>
+        // ============================================================
+        //  CONFIG
+        // ============================================================
+        const CONFIG = {
+            rarities: {
+                COMMON: { index: 0, color: '#94a3b8', weight: 60, diffMult: 1 },
+                UNCOMMON: { index: 1, color: '#4ade80', weight: 25, diffMult: 1.5 },
+                RARE: { index: 2, color: '#60a5fa', weight: 10, diffMult: 2.5 },
+                EPIC: { index: 3, color: '#c084fc', weight: 3, diffMult: 4 },
+                LEGENDARY: { index: 4, color: '#fbbf24', weight: 0.8, diffMult: 7 },
+                MYTHICAL: { index: 5, color: '#f43f5e', weight: 0.15, diffMult: 12 },
+                DIVINE: { index: 6, color: '#ffffff', weight: 0.05, diffMult: 20 }
+            },
+            areas: [
+                { name: "Peaceful Lake", emoji: "🏞️", minLevel: 1, unlockCost: 0, fishMult: 1, skyTop: "#0f1923", skyMid: "#1e3a5f", skyBot: "#0a1628", waterCol: "#1e40af", diffMult: 1 },
+                { name: "Rapid River", emoji: "🌊", minLevel: 5, unlockCost: 500, fishMult: 2.5, skyTop: "#0f1e1a", skyMid: "#064e3b", skyBot: "#022c22", waterCol: "#065f46", diffMult: 1.5 },
+                { name: "Coral Reef", emoji: "🪸", minLevel: 12, unlockCost: 3000, fishMult: 5, skyTop: "#1a0a22", skyMid: "#7c3aed", skyBot: "#4c1d95", waterCol: "#6d28d9", diffMult: 2 },
+                { name: "Sunken Ocean", emoji: "🌊", minLevel: 20, unlockCost: 12000, fishMult: 10, skyTop: "#020617", skyMid: "#1e3a8a", skyBot: "#0f172a", waterCol: "#1e3a8a", diffMult: 3 },
+                { name: "Volcanic Vent", emoji: "🌋", minLevel: 30, unlockCost: 60000, fishMult: 22, skyTop: "#1a0505", skyMid: "#7f1d1d", skyBot: "#3b0000", waterCol: "#991b1b", diffMult: 4 },
+                { name: "Celestial Sea", emoji: "✨", minLevel: 45, unlockCost: 300000, fishMult: 60, skyTop: "#050514", skyMid: "#1e1b4b", skyBot: "#0f0f2d", waterCol: "#3730a3", diffMult: 6 },
+                { name: "The Void", emoji: "🌑", minLevel: 60, unlockCost: 2000000, fishMult: 250, skyTop: "#000000", skyMid: "#0a0010", skyBot: "#000000", waterCol: "#1a0030", diffMult: 10 }
+            ],
+            rods: [
+                { name: "Bamboo Pole", hooks: 1, maxWeight: 15, luckBonus: 0, cost: 0, linger: 3000, castSpeed: 1, desc: "Starter rod. Free!" },
+                { name: "Sturdy Rod", hooks: 1, maxWeight: 80, luckBonus: 5, cost: 400, linger: 3500, castSpeed: 1.2, desc: "Better weight cap" },
+                { name: "Carbon Fiber", hooks: 1, maxWeight: 200, luckBonus: 10, cost: 2000, linger: 4000, castSpeed: 1.5, desc: "Lightweight & precise" },
+                { name: "Twin-Line", hooks: 2, maxWeight: 120, luckBonus: 12, cost: 6000, linger: 4000, castSpeed: 1.3, desc: "2 hooks at once" },
+                { name: "Heavy Duty", hooks: 1, maxWeight: 1500, luckBonus: 20, cost: 18000, linger: 4500, castSpeed: 1.1, desc: "Massive catch weight" },
+                { name: "Trident Reeler", hooks: 3, maxWeight: 500, luckBonus: 30, cost: 55000, linger: 5000, castSpeed: 1.6, desc: "3 hooks, high luck" },
+                { name: "Abyssal Rod", hooks: 2, maxWeight: 8000, luckBonus: 40, cost: 200000, linger: 5500, castSpeed: 1.4, desc: "Built for the deep" },
+                { name: "Leviathan Tamer", hooks: 4, maxWeight: 30000, luckBonus: 60, cost: 800000, linger: 6500, castSpeed: 1.8, desc: "4 hooks, legendary tier" },
+                { name: "Void Weaver", hooks: 3, maxWeight: 999999, luckBonus: 100, cost: 5000000, linger: 8000, castSpeed: 2.2, desc: "Catches the uncatchable" }
+            ],
+            fishData: [
+                { name: "Minnow", rarity: "COMMON", area: 0, baseVal: 5, weightRange: [0.1, 0.5] },
+                { name: "Perch", rarity: "COMMON", area: 0, baseVal: 12, weightRange: [0.5, 2] },
+                { name: "Bluegill", rarity: "COMMON", area: 0, baseVal: 18, weightRange: [0.3, 1.5] },
+                { name: "Bass", rarity: "UNCOMMON", area: 0, baseVal: 40, weightRange: [2, 8] },
+                { name: "Carp", rarity: "RARE", area: 0, baseVal: 90, weightRange: [5, 15] },
+                { name: "Golden Koi", rarity: "EPIC", area: 0, baseVal: 500, weightRange: [3, 12] },
+                { name: "Lake Spirit", rarity: "LEGENDARY", area: 0, baseVal: 3000, weightRange: [0.5, 3] },
+                { name: "Rainbow Trout", rarity: "COMMON", area: 1, baseVal: 40, weightRange: [1, 5] },
+                { name: "Catfish", rarity: "COMMON", area: 1, baseVal: 35, weightRange: [2, 10] },
+                { name: "Salmon", rarity: "UNCOMMON", area: 1, baseVal: 120, weightRange: [5, 25] },
+                { name: "Sturgeon", rarity: "RARE", area: 1, baseVal: 500, weightRange: [20, 100] },
+                { name: "River Serpent", rarity: "EPIC", area: 1, baseVal: 2000, weightRange: [50, 200] },
+                { name: "King Salmon", rarity: "LEGENDARY", area: 1, baseVal: 8000, weightRange: [80, 400] },
+                { name: "Clownfish", rarity: "COMMON", area: 2, baseVal: 80, weightRange: [0.2, 1] },
+                { name: "Parrotfish", rarity: "COMMON", area: 2, baseVal: 120, weightRange: [1, 4] },
+                { name: "Moray Eel", rarity: "UNCOMMON", area: 2, baseVal: 400, weightRange: [3, 15] },
+                { name: "Lionfish", rarity: "RARE", area: 2, baseVal: 1200, weightRange: [1, 5] },
+                { name: "Manta Ray", rarity: "EPIC", area: 2, baseVal: 5000, weightRange: [200, 800] },
+                { name: "Reef Dragon", rarity: "LEGENDARY", area: 2, baseVal: 20000, weightRange: [100, 500] },
+                { name: "Tuna", rarity: "COMMON", area: 3, baseVal: 250, weightRange: [50, 200] },
+                { name: "Swordfish", rarity: "UNCOMMON", area: 3, baseVal: 900, weightRange: [80, 350] },
+                { name: "Marlin", rarity: "RARE", area: 3, baseVal: 3500, weightRange: [150, 600] },
+                { name: "Great White", rarity: "EPIC", area: 3, baseVal: 12000, weightRange: [500, 3000] },
+                { name: "Megalodon", rarity: "LEGENDARY", area: 3, baseVal: 60000, weightRange: [2000, 10000] },
+                { name: "Magma Eel", rarity: "COMMON", area: 4, baseVal: 800, weightRange: [1, 8] },
+                { name: "Lava Carp", rarity: "UNCOMMON", area: 4, baseVal: 3000, weightRange: [10, 50] },
+                { name: "Inferno Ray", rarity: "RARE", area: 4, baseVal: 12000, weightRange: [50, 300] },
+                { name: "Molten Leviathan", rarity: "EPIC", area: 4, baseVal: 50000, weightRange: [500, 3000] },
+                { name: "Volcanic God", rarity: "MYTHICAL", area: 4, baseVal: 250000, weightRange: [2000, 15000] },
+                { name: "Star Jellyfish", rarity: "UNCOMMON", area: 5, baseVal: 5000, weightRange: [0.5, 3] },
+                { name: "Nebula Shark", rarity: "RARE", area: 5, baseVal: 25000, weightRange: [200, 1000] },
+                { name: "Comet Whale", rarity: "EPIC", area: 5, baseVal: 120000, weightRange: [5000, 30000] },
+                { name: "Celestial Leviathan", rarity: "LEGENDARY", area: 5, baseVal: 500000, weightRange: [50000, 200000] },
+                { name: "The Cosmos", rarity: "DIVINE", area: 5, baseVal: 5000000, weightRange: [1, 999999] },
+                { name: "Void Wraith", rarity: "RARE", area: 6, baseVal: 50000, weightRange: [0.1, 5] },
+                { name: "Null Shark", rarity: "EPIC", area: 6, baseVal: 300000, weightRange: [100, 1000] },
+                { name: "Abyssal Horror", rarity: "LEGENDARY", area: 6, baseVal: 1500000, weightRange: [1000, 10000] },
+                { name: "The Endgod", rarity: "MYTHICAL", area: 6, baseVal: 10000000, weightRange: [50000, 500000] },
+                { name: "\u0337\u0328\u0324\u032b\u032f", rarity: "DIVINE", area: 6, baseVal: 99999999, weightRange: [0.001, 0.001] }
+            ]
+        };
+
+        const WEATHERS = {
+            Clear: { emoji: "☀️", biteSpeedMult: 1, valueMult: 1, rareLuck: 0, fogAlpha: 0, lightning: false, rain: false, snow: false, windStr: 0.3, desc: "Balanced conditions" },
+            Cloudy: { emoji: "☁️", biteSpeedMult: 0.9, valueMult: 1.1, rareLuck: 0, fogAlpha: 0.1, lightning: false, rain: false, snow: false, windStr: 0.5, desc: "+10% fish value" },
+            Rainy: { emoji: "🌧️", biteSpeedMult: 1.5, valueMult: 1.2, rareLuck: 5, fogAlpha: 0.05, lightning: false, rain: true, snow: false, windStr: 0.8, desc: "Faster bites, +20% value" },
+            Foggy: { emoji: "🌫️", biteSpeedMult: 0.7, valueMult: 1.4, rareLuck: 10, fogAlpha: 0.35, lightning: false, rain: false, snow: false, windStr: 0.1, desc: "Rare fish surge, +40% value" },
+            Stormy: { emoji: "⛈️", biteSpeedMult: 2, valueMult: 1.6, rareLuck: 15, fogAlpha: 0.1, lightning: true, rain: true, snow: false, windStr: 1.5, desc: "STORM: fastest bites, +60% value" },
+            Blizzard: { emoji: "❄️", biteSpeedMult: 0.5, valueMult: 2, rareLuck: 20, fogAlpha: 0.2, lightning: false, rain: false, snow: true, windStr: 1.2, desc: "Rare surge, DOUBLE value" },
+            Eclipse: { emoji: "🌑", biteSpeedMult: 1.8, valueMult: 3, rareLuck: 35, fogAlpha: 0.15, lightning: false, rain: false, snow: false, windStr: 0.4, desc: "ECLIPSE: triple value, mythics appear" },
+            Bloodmoon: { emoji: "🌕", biteSpeedMult: 2.5, valueMult: 5, rareLuck: 50, fogAlpha: 0.08, lightning: true, rain: false, snow: false, windStr: 2.0, desc: "⚠️ BLOOD MOON: 5× value, Divines awakened!" }
+        };
+
+        const MUTATION_CLASSES = {
+            Common: { id: 0, color: '#94a3b8', mult: 1.3, weight: 1000 },
+            Uncommon: { id: 1, color: '#4ade80', mult: 1.8, weight: 400 },
+            Rare: { id: 2, color: '#60a5fa', mult: 3.0, weight: 120 },
+            UltraRare: { id: 3, color: '#f43f5e', mult: 6.0, weight: 40 },
+            Legendary: { id: 4, color: '#fbbf24', mult: 18.0, weight: 10 },
+            Mythical: { id: 5, color: '#c084fc', mult: 50.0, weight: 2.5 },
+            Divine: { id: 6, color: '#facc15', mult: 200.0, weight: 0.8 },
+            Secret: { id: 7, color: '#ffffff', mult: 1500.0, weight: 0.1 }
+        };
+
+        const MUTATIONS = [
+            { name: "Plump", class: "Common" }, { name: "Muddy", class: "Common" }, { name: "Lazy", class: "Common" },
+            { name: "Spotted", class: "Common" }, { name: "Striped", class: "Common" }, { name: "Scaly", class: "Common" },
+            { name: "Feisty", class: "Common" }, { name: "Hungry", class: "Common" }, { name: "Sunburnt", class: "Common" },
+            { name: "Damp", class: "Common" }, { name: "Mossy", class: "Common" }, { name: "Pudgy", class: "Common" },
+            { name: "Shiny", class: "Uncommon" }, { name: "Heavy", class: "Uncommon" }, { name: "Agile", class: "Uncommon" },
+            { name: "Armored", class: "Uncommon" }, { name: "Long", class: "Uncommon" }, { name: "Sleek", class: "Uncommon" },
+            { name: "Spiky", class: "Uncommon" }, { name: "Vicious", class: "Uncommon" }, { name: "Clever", class: "Uncommon" },
+            { name: "Ancient", class: "Uncommon" }, { name: "Frostbitten", class: "Uncommon" }, { name: "Stormy", class: "Uncommon" },
+            { name: "Giant", class: "Rare" }, { name: "Albino", class: "Rare" }, { name: "Electric", class: "Rare" },
+            { name: "Metallic", class: "Rare" }, { name: "Crystalline", class: "Rare" }, { name: "Ghostly", class: "Rare" },
+            { name: "Phantom", class: "Rare" }, { name: "Luminous", class: "Rare" }, { name: "Savage", class: "Rare" },
+            { name: "Venomous", class: "Rare" }, { name: "Magnetic", class: "Rare" }, { name: "Prismatic", class: "Rare" },
+            { name: "Frozen", class: "Rare" }, { name: "Charred", class: "Rare" }, { name: "Eclipsed", class: "Rare" },
+            { name: "Radioactive", class: "UltraRare" }, { name: "Prehistoric", class: "UltraRare" }, { name: "Neon", class: "UltraRare" },
+            { name: "Infernal", class: "UltraRare" }, { name: "Glacial", class: "UltraRare" }, { name: "Toxic", class: "UltraRare" },
+            { name: "Corrupted", class: "UltraRare" }, { name: "Symbiotic", class: "UltraRare" }, { name: "Abyssal", class: "UltraRare" },
+            { name: "Starborn", class: "UltraRare" }, { name: "Bloodsoaked", class: "UltraRare" }, { name: "Stormwracked", class: "UltraRare" },
+            { name: "Golden", class: "Legendary" }, { name: "Diamond", class: "Legendary" }, { name: "Kraken-Touched", class: "Legendary" },
+            { name: "Royal", class: "Legendary" }, { name: "Spectral", class: "Legendary" }, { name: "Leviathan-Blooded", class: "Legendary" },
+            { name: "Moonwalker", class: "Legendary" }, { name: "Sunforged", class: "Legendary" }, { name: "Tidecaller", class: "Legendary" },
+            { name: "Void-Touched", class: "Mythical" }, { name: "Ethereal", class: "Mythical" }, { name: "Astral", class: "Mythical" },
+            { name: "Quantum", class: "Mythical" }, { name: "Temporal", class: "Mythical" }, { name: "Dreamborn", class: "Mythical" },
+            { name: "Bloodmoon-Cursed", class: "Mythical" }, { name: "Eclipse-Born", class: "Mythical" },
+            { name: "Celestial", class: "Divine" }, { name: "God-King", class: "Divine" }, { name: "Omniscient", class: "Divine" },
+            { name: "Timeless", class: "Divine" }, { name: "Primordial", class: "Divine" },
+            { name: "Glitched", class: "Secret" }, { name: "[NULL]", class: "Secret" }, { name: "ERROR", class: "Secret" },
+            { name: "\u0337\u0331\u0324\u032b", class: "Secret" }
         ];
-        let uh='';
-        UPGS.forEach(u=>{
-            const lv=this.state.upgrades[u.id], cost=Math.floor(u.base*Math.pow(1.8,lv));
-            uh+=`<div class="upgrade-item">
-                <div class="item-header"><i class="${u.icon}"></i> &nbsp;${u.name} <span style="color:var(--accent);font-size:0.85rem;font-weight:normal;">Lv.${lv}</span></div>
-                <div class="item-stats">${u.desc}</div>
-                <button class="btn-buy" ${this.state.money<cost?'disabled':''} onclick="game.buyUpgrade('${u.id}',${cost})">
-                    <i class="fa-solid fa-arrow-up"></i> &nbsp;Upgrade: $${cost.toLocaleString()}
-                </button>
-            </div>`;
-        });
-        document.getElementById('upgrades-list').innerHTML=uh;
 
-        // --- TRAVEL ---
-        let ah='';
-        CONFIG.areas.forEach((area,i)=>{
-            const ul=this.state.unlockedAreas.includes(i), cu=this.state.level>=area.minLevel&&this.state.money>=area.unlockCost, ia=this.state.currentArea===i;
-            if(ul){
-                ah+=`<div class="upgrade-item">
-                    <div class="item-header" style="color:${ia?'var(--success)':'#fff'}">${area.name}</div>
-                    <div class="item-stats"><i class="fa-solid fa-arrow-trend-up" style="width:14px"></i> x${area.fishMult} fish value &nbsp;·&nbsp; <i class="fa-solid fa-user" style="width:14px"></i> Lv.${area.minLevel}+</div>
-                    <button class="${ia?'btn-equipped':'btn-equip'}" ${ia?'disabled':''} onclick="game.travelTo(${i})">
-                        ${ia?'<i class="fa-solid fa-location-dot"></i> &nbsp;Current Area':'<i class="fa-solid fa-sailboat"></i> &nbsp;Travel Here'}
-                    </button>
-                </div>`;
-            } else {
-                ah+=`<div class="upgrade-item" style="opacity:0.7">
-                    <div class="item-header" style="color:#555">${area.name}</div>
-                    <div class="item-stats"><i class="fa-solid fa-lock" style="width:14px"></i> Requires Lv.${area.minLevel} &nbsp;·&nbsp; $${area.unlockCost.toLocaleString()}</div>
-                    <button class="btn-buy" ${!cu?'disabled':''} onclick="game.unlockArea(${i},${area.unlockCost})">
-                        <i class="fa-solid fa-unlock"></i> &nbsp;Unlock: $${area.unlockCost.toLocaleString()}
-                    </button>
-                </div>`;
+        const BAITS = {
+            "Worm": { emoji: "🪱", cost: 50, maxUses: 10, valueMult: 1.1, mutChance: 0, desc: "Basic bait — slight value boost. 10 uses" },
+            "Shrimp": { emoji: "🦐", cost: 200, maxUses: 8, valueMult: 1.25, mutChance: 0.02, desc: "+25% value, small mutation chance. 8 uses" },
+            "Squid": { emoji: "🦑", cost: 800, maxUses: 5, valueMult: 1.5, mutChance: 0.05, desc: "+50% value, good mutation trigger. 5 uses" },
+            "Glowbait": { emoji: "💚", cost: 3000, maxUses: 4, valueMult: 2.0, mutChance: 0.08, desc: "Double value, mutation surge. 4 uses" },
+            "Void Fragment": { emoji: "🌑", cost: 50000, maxUses: 2, valueMult: 5.0, mutChance: 0.2, desc: "5× value, massive mutation surge. 2 uses" }
+        };
+
+        // ============================================================
+        //  SAVE SLOT MANAGER
+        // ============================================================
+        class SaveSlotManager {
+            static getSlots() {
+                const slots = localStorage.getItem('zenFisherSlots');
+                return slots ? JSON.parse(slots) : {};
             }
-        });
-        document.getElementById('areas-list').innerHTML=ah;
-    }
 
-    buyRod(i,cost){ if(this.state.money>=cost&&!this.state.ownedRods.includes(i)){this.state.money-=cost;this.state.ownedRods.push(i);this.state.equippedRod=i;this.updateUI();this.renderShop();this.log(`Bought and equipped ${CONFIG.rods[i].name}!`,"#4ade80");} }
-    equipRod(i){ if(this.state.ownedRods.includes(i)){this.state.equippedRod=i;this.updateUI();this.renderShop();this.log(`Equipped ${CONFIG.rods[i].name}.`,"#00b0f0");} }
-    buyUpgrade(id,cost){ if(this.state.money>=cost){this.state.money-=cost;this.state.upgrades[id]++;this.updateUI();this.renderShop();this.log(`Upgraded ${id}!`,"#4ade80");} }
-    travelTo(i){ this.state.currentArea=i; this.updateUI(); this.renderShop(); }
-    unlockArea(i,cost){ if(this.state.money>=cost){this.state.money-=cost;this.state.unlockedAreas.push(i);this.state.currentArea=i;this.updateUI();this.renderShop();} }
+            static saveSlot(slotName, gameState) {
+                const slots = this.getSlots();
+                slots[slotName] = {
+                    ...gameState,
+                    lastSaved: Date.now(),
+                    version: '2.0'
+                };
+                localStorage.setItem('zenFisherSlots', JSON.stringify(slots));
+                localStorage.setItem('zenFisherCurrentSlot', slotName);
+            }
 
-    log(msg,color='#fff'){
-        const log=document.getElementById('log-panel');
-        const e=document.createElement('div'); e.className='log-entry'; e.style.color=color; e.innerText=`> ${msg}`;
-        log.prepend(e); if(log.childNodes.length>25) log.removeChild(log.lastChild);
-    }
+            static loadSlot(slotName) {
+                const slots = this.getSlots();
+                return slots[slotName] || null;
+            }
 
-    spawnSplash(x,y,n){ for(let i=0;i<n;i++) this.particles.push({x,y,vx:(Math.random()-0.5)*8,vy:(Math.random()-0.5)*8,life:1.0}); }
+            static deleteSlot(slotName) {
+                const slots = this.getSlots();
+                delete slots[slotName];
+                localStorage.setItem('zenFisherSlots', JSON.stringify(slots));
+            }
 
-    createNotif(text,x,y,color){
-        const n=document.createElement('div'); n.className='notif';
-        n.style.left=x+'px'; n.style.top=y+'px'; n.style.color=color; n.innerText=text;
-        document.body.appendChild(n); setTimeout(()=>n.remove(),1500);
-    }
+            static getCurrentSlot() {
+                return localStorage.getItem('zenFisherCurrentSlot') || null;
+            }
 
-    save(){ localStorage.setItem('zenFisherMobile',JSON.stringify(this.state)); }
-    load(){
-        const s=localStorage.getItem('zenFisherMobile');
-        if(s){const p=JSON.parse(s);this.state={...this.state,...p};}
-        if(!this.state.ownedRods){this.state.ownedRods=[0];this.state.equippedRod=0;}
-    }
-    resetGame(){ if(confirm("Reset all progress? This cannot be undone!")){ localStorage.removeItem('zenFisherMobile'); location.reload(); } }
-
-    loop(ts){ const dt=ts-this.lastTime; this.lastTime=ts; this.update(dt,ts); this.draw(ts); requestAnimationFrame(t=>this.loop(t)); }
-
-    update(dt,ts){
-        if(this.state.upgrades.auto>0){
-            this.autoFisherTimer+=dt;
-            if(this.autoFisherTimer>3000){this.state.money+=this.state.upgrades.auto*5*CONFIG.areas[this.state.currentArea].fishMult;this.autoFisherTimer=0;this.updateUI();this.renderShop();}
+            static getAllSlotNames() {
+                return Object.keys(this.getSlots());
+            }
         }
-        for(let i=this.yankedFishes.length-1;i>=0;i--){
-            let yf=this.yankedFishes[i];
-            yf.x+=yf.vx; yf.vy+=0.4*(dt/16.66); yf.y+=yf.vy*(dt/16.66);
-            yf.rotation+=yf.rotSpeed*(dt/16.66); yf.life-=dt/2500;
-            if(yf.life<=0) this.yankedFishes.splice(i,1);
-        }
-        if(this.fishingState==='IDLE') return;
-        let anyBites=false, allEsc=true;
-        this.hooks.forEach(h=>{
-            h.offset=Math.sin(ts/500)*5;
-            if(h.state==='CASTING'){ h.y+=(h.targetY-h.y)*0.1; allEsc=false; }
-            else if(h.state==='WAITING'){ allEsc=false; h.biteTimer-=dt; if(h.biteTimer<=0){h.state='BITE';this.fishingState='BITE';this.spawnSplash(h.x,h.y,10);h.biteWindow=h.lingerTime;} }
-            else if(h.state==='BITE'){ allEsc=false; anyBites=true; h.biteWindow-=dt; if(h.biteWindow<=0){h.state='ESCAPED';this.spawnSplash(h.x,h.y,5);} }
-        });
-        if(this.fishingState==='BITE'&&!anyBites&&allEsc){this.fishingState='IDLE';this.log("The fish took the bait and left...","#94a3b8");}
-        else if(this.fishingState==='REELING'){
-            this.miniGame.cursor+=this.miniGame.speed*this.miniGame.direction*(dt/16.66);
-            if(this.miniGame.cursor>100||this.miniGame.cursor<0){this.miniGame.direction*=-1;this.miniGame.cursor=Math.max(0,Math.min(100,this.miniGame.cursor));}
-            document.getElementById('timing-cursor').style.left=this.miniGame.cursor+'%';
-            if(this.miniGame.zenTimer>0) this.miniGame.zenTimer-=dt/1000;
-            else if(this.miniGame.freezeDecayTimer>0) this.miniGame.freezeDecayTimer-=dt/1000;
-            else this.miniGame.progress-=this.miniGame.drainRate*(dt/1000);
-            if(this.miniGame.progress<=0) this.escapeFish();
-            document.getElementById('catch-progress-fill').style.width=Math.max(0,Math.min(100,(this.miniGame.progress/this.miniGame.maxProgress)*100))+'%';
-        }
-        for(let i=this.particles.length-1;i>=0;i--){let p=this.particles[i];p.x+=p.vx;p.y+=p.vy;p.life-=0.02;if(p.life<=0)this.particles.splice(i,1);}
-    }
 
-    draw(ts){
-        const ctx=this.ctx,w=this.canvas.width,h=this.canvas.height;
-        const g=ctx.createLinearGradient(0,0,0,h);
-        g.addColorStop(0,'#111214'); g.addColorStop(0.5,CONFIG.areas[this.state.currentArea].color); g.addColorStop(1,'#000');
-        ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-        ctx.beginPath(); ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=3;
-        for(let i=0;i<5;i++){const y=h*0.6+(i*50),off=Math.sin((ts/1000)+i)*50;ctx.moveTo(0,y+off);ctx.quadraticCurveTo(w/2,y-off,w,y+off);}
-        ctx.stroke();
-        this.yankedFishes.forEach(yf=>{ctx.save();ctx.translate(yf.x,yf.y);ctx.rotate(yf.rotation);this.drawFishEntity(ctx,0,0,yf.size,yf.fishData,yf.life);ctx.restore();});
-        if(this.fishingState!=='IDLE'&&this.hooks){
-            this.hooks.forEach(hook=>{
-                if(hook.state==='ESCAPED') return;
-                const bx=hook.x,by=hook.y+(hook.state==='WAITING'?hook.offset:0);
-                ctx.beginPath();ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.moveTo(w/2,h*0.2);ctx.lineTo(bx,by);ctx.stroke();
-                ctx.fillStyle=hook.state==='BITE'?'#ef4444':'#fff';ctx.beginPath();ctx.arc(bx,by,8,0,Math.PI*2);ctx.fill();
-                ctx.fillStyle='#ef4444';ctx.beginPath();ctx.arc(bx,by,4,0,Math.PI*2);ctx.fill();
-                if(hook.state==='BITE'){ctx.beginPath();ctx.strokeStyle=`rgba(255,255,255,${Math.sin(ts/100)})`;ctx.arc(bx,by,20+Math.sin(ts/100)*10,0,Math.PI*2);ctx.stroke();}
-            });
-        }
-        this.particles.forEach(p=>{ctx.fillStyle=`rgba(255,255,255,${p.life})`;ctx.fillRect(p.x,p.y,4,4);});
-        if(this.fishingState==='IDLE'){
-            ctx.globalAlpha=0.4+Math.sin(ts/600)*0.25;
-            ctx.fillStyle='#ffffff'; ctx.font='bold 15px Segoe UI';
-            ctx.textAlign='center'; ctx.fillText('TAP TO CAST',w/2,h*0.84);
-            ctx.textAlign='left'; ctx.globalAlpha=1;
-        }
-    }
-}
+        // ============================================================
+        //  GAME CLASS
+        // ============================================================
+        class Game {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.currentSlot = null;
+                this.state = this.getDefaultState();
+                this.fishingState = 'IDLE';
+                this.hooks = []; this.activeFishes = []; this.yankedFishes = []; this.bittenHooksPositions = [];
+                this.miniGame = { cursor: 0, speed: 2, dir: 1, targetStart: 30, targetWidth: 30, perfectStart: 40, perfectWidth: 10, progress: 0, maxProgress: 100, drainRate: 5, freezeTimer: 0, zenTimer: 0 };
+                this.particles = []; this.weatherParticles = []; this.ripples = []; this.lightningFlash = 0;
+                this.lastTime = 0; this.autoFisherTimer = 0; this.combo = 0; this.lastCatchTime = 0;
+                this.encSortMode = 'mutation'; this.encOpen = false;
+                this.waveOffset = 0; this.castArcProg = 0;
+                this.init();
+            }
 
-const game = new Game();
-</script>
+            getDefaultState() {
+                return {
+                    money: 0, totalCaught: 0, totalEarned: 0, level: 1, xp: 0,
+                    currentArea: 0, unlockedAreas: [0], encyclopedia: [],
+                    ownedRods: [0], equippedRod: 0, activeBait: null, baitUses: 0,
+                    upgrades: { line: 0, reel: 0, luck: 0, auto: 0, depth: 0, sonar: 0, stormgear: 0, magnetism: 0, netweave: 0, stabilizer: 0 },
+                    weather: 'Clear', bestCombo: 0, version: '2.0'
+                };
+            }
+
+            init() {
+                this.checkForUpdateNotification();
+                this.load();
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                window.addEventListener('keydown', (e) => { if (e.code === 'Space' && !this.encOpen) { e.preventDefault(); if (!e.repeat) this.handleAction(); } });
+                this.canvas.addEventListener('pointerdown', () => { if (!this.encOpen) this.handleAction(); });
+                document.getElementById('tap-zone').addEventListener('pointerdown', (e) => { e.stopPropagation(); if (!this.encOpen) this.handleAction(); });
+                
+                document.querySelectorAll('.nav-item').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                        const tab = btn.dataset.tab;
+                        if (tab === 'profile') document.getElementById('profile-panel').classList.add('active');
+                        if (tab === 'upgrades') document.getElementById('upgrades-panel').classList.add('active');
+                    });
+                });
+                
+                document.querySelectorAll('.sub-tab-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+                        document.querySelectorAll('.sub-tab-content').forEach(c => c.classList.remove('active'));
+                        btn.classList.add('active');
+                        document.getElementById('sub-' + btn.dataset.sub).classList.add('active');
+                    });
+                });
+                
+                this.renderShop(); this.updateUI();
+                this.scheduleWeather();
+                setInterval(() => this.save(), 8000);
+                requestAnimationFrame(t => this.loop(t));
+            }
+
+            checkForUpdateNotification() {
+                const hasSeenUpdate = localStorage.getItem('zenFisherSeenUpdate');
+                const oldSaveExists = localStorage.getItem('zenFisher3');
+                
+                if (oldSaveExists && !hasSeenUpdate) {
+                    setTimeout(() => {
+                        document.getElementById('update-notification').style.display = 'flex';
+                    }, 500);
+                }
+            }
+
+            dismissUpdateNotification() {
+                localStorage.setItem('zenFisherSeenUpdate', 'true');
+                document.getElementById('update-notification').style.display = 'none';
+                this.loadFromOldSave();
+            }
+
+            loadFromOldSave() {
+                const oldSave = localStorage.getItem('zenFisher3');
+                if (oldSave) {
+                    try {
+                        const oldState = JSON.parse(oldSave);
+                        this.state = { ...this.getDefaultState(), ...oldState };
+                        if (!this.state.upgrades.stabilizer) this.state.upgrades.stabilizer = 0;
+                        if (!this.state.version) this.state.version = '1.0';
+                        this.log("Loaded your previous save! Some balance changes applied.", "#facc15");
+                        this.updateUI();
+                        this.renderShop();
+                    } catch(e) {}
+                }
+            }
+
+            showSaveSlots() {
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                document.getElementById('save-slots-panel').classList.add('active');
+                this.renderSaveSlots();
+            }
+
+            renderSaveSlots() {
+                const container = document.getElementById('save-slots-list');
+                const slots = SaveSlotManager.getAllSlotNames();
+                const currentSlot = SaveSlotManager.getCurrentSlot();
+                
+                let html = '';
+                
+                // New slot button
+                html += `<div class="slot-card">
+                    <div class="slot-name">➕ New Save</div>
+                    <div class="slot-stats">Create a fresh adventure</div>
+                    <div class="slot-actions">
+                        <button class="btn-buy" onclick="game.createNewSlot()">Create New</button>
+                    </div>
+                </div>`;
+                
+                // Existing slots
+                slots.forEach(slot => {
+                    const isCurrent = slot === currentSlot;
+                    html += `<div class="slot-card" style="border-color: ${isCurrent ? '#00b0f0' : '#1e293b'}">
+                        <div class="slot-name">${slot} ${isCurrent ? '✓' : ''}</div>
+                        <div class="slot-stats">Click to load this save</div>
+                        <div class="slot-actions">
+                            <button class="btn-equip" onclick="game.loadSlot('${slot}')">Load</button>
+                            <button class="btn-reset" onclick="game.deleteSlot('${slot}')">Delete</button>
+                        </div>
+                    </div>`;
+                });
+                
+                container.innerHTML = html;
+            }
+
+            createNewSlot() {
+                const slotName = prompt("Enter save slot name:", `Fisher_${Date.now().toString().slice(-6)}`);
+                if (slotName && slotName.trim()) {
+                    const cleanName = slotName.trim();
+                    if (SaveSlotManager.loadSlot(cleanName)) {
+                        alert("A save with this name already exists!");
+                        return;
+                    }
+                    this.state = this.getDefaultState();
+                    this.currentSlot = cleanName;
+                    this.save();
+                    this.updateUI();
+                    this.renderShop();
+                    document.getElementById('save-slots-panel').classList.remove('active');
+                    this.log(`Created new save: ${cleanName}`, "#4ade80");
+                }
+            }
+
+            loadSlot(slotName) {
+                const savedState = SaveSlotManager.loadSlot(slotName);
+                if (savedState) {
+                    this.state = { ...this.getDefaultState(), ...savedState };
+                    if (!this.state.upgrades.stabilizer) this.state.upgrades.stabilizer = 0;
+                    this.currentSlot = slotName;
+                    this.updateUI();
+                    this.renderShop();
+                    document.getElementById('save-slots-panel').classList.remove('active');
+                    this.log(`Loaded save: ${slotName}`, "#4ade80");
+                }
+            }
+
+            deleteSlot(slotName) {
+                if (confirm(`Delete save "${slotName}"? This cannot be undone!`)) {
+                    SaveSlotManager.deleteSlot(slotName);
+                    if (this.currentSlot === slotName) {
+                        this.currentSlot = null;
+                        this.state = this.getDefaultState();
+                    }
+                    this.renderSaveSlots();
+                    this.log(`Deleted save: ${slotName}`, "#f87171");
+                }
+            }
+
+            scheduleWeather() {
+                setTimeout(() => {
+                    const ws = Object.keys(WEATHERS);
+                    const idx = Math.floor(Math.pow(Math.random(), 1.6) * (ws.length));
+                    this.setWeather(ws[Math.min(idx, ws.length - 1)]);
+                    this.scheduleWeather();
+                }, 60000 + Math.random() * 120000);
+            }
+
+            setWeather(w) {
+                this.state.weather = w;
+                this.weatherParticles = [];
+                const wd = WEATHERS[w];
+                if (wd.rain || wd.snow) for (let i = 0; i < 100; i++) this.spawnWP(true);
+                if (w === 'Bloodmoon' || w === 'Eclipse') this.showComboPopup(wd.emoji + ' ' + w.toUpperCase() + '!', w === 'Bloodmoon' ? '#ef4444' : '#6366f1');
+                this.log(wd.emoji + ' ' + w + ' — ' + wd.desc, '#94a3b8');
+                this.updateUI();
+            }
+
+            spawnWP(init = false) {
+                const wd = WEATHERS[this.state.weather];
+                const sn = wd.snow;
+                this.weatherParticles.push({
+                    x: Math.random() * this.canvas.width, y: init ? Math.random() * this.canvas.height : -10,
+                    vx: sn ? (Math.random() - 0.5) * 1.5 : (-1 + Math.random() * 0.4) * wd.windStr * 3,
+                    vy: sn ? 0.8 + Math.random() * 1.2 : 8 + Math.random() * 8,
+                    size: sn ? 2 + Math.random() * 3 : 1 + Math.random(), alpha: 0.5 + Math.random() * 0.5, sn
+                });
+            }
+
+            resize() { this.canvas.width = this.canvas.offsetWidth; this.canvas.height = this.canvas.offsetHeight; }
+
+            handleAction() {
+                if (this.fishingState === 'IDLE') this.startCasting();
+                else if (this.fishingState === 'WAITING' || this.fishingState === 'BITE') {
+                    const bitten = this.hooks.filter(h => h.state === 'BITE');
+                    const empty = this.hooks.filter(h => h.state === 'WAITING' || h.state === 'CASTING');
+                    this.bittenHooksPositions = bitten.map(h => ({ x: h.x, y: h.y }));
+                    if (bitten.length > 0) {
+                        empty.forEach(h => { h.state = 'ESCAPED'; this.spawnSplash(h.x, h.y, 6); });
+                        this.startMiniGame(bitten.length);
+                    } else {
+                        this.fishingState = 'IDLE';
+                        this.hooks.forEach(h => { h.state = 'ESCAPED'; this.spawnSplash(h.x, h.y, 6); });
+                        this.log("Too early! Fish scattered.", "#f87171"); this.combo = 0;
+                    }
+                } else if (this.fishingState === 'REELING') this.checkMiniGame();
+            }
+
+            startCasting() {
+                this.fishingState = 'CASTING';
+                const rod = CONFIG.rods[this.state.equippedRod];
+                const wd = WEATHERS[this.state.weather];
+                this.hooks = [];
+                const spacing = 50, startX = (this.canvas.width / 2) - ((rod.hooks - 1) * spacing / 2);
+                for (let i = 0; i < rod.hooks; i++) {
+                    let bt = (2800 + Math.random() * 5000) / (1 + this.state.upgrades.reel * 0.25);
+                    bt /= wd.biteSpeedMult;
+                    if (this.state.upgrades.sonar > 0) bt *= Math.max(0.4, 1 - this.state.upgrades.sonar * 0.1);
+                    this.hooks.push({
+                        state: 'CASTING',
+                        x: startX + (i * spacing) + (Math.random() * 30 - 15), y: -50,
+                        targetY: this.canvas.height * 0.62 + (Math.random() * 70),
+                        offset: 0, bobble: 0, biteTimer: bt,
+                        lingerTime: rod.linger * (1 + this.state.upgrades.stormgear * 0.05),
+                        biteWindow: 0, rippleSpawned: false
+                    });
+                }
+                this.castArcProg = 0;
+                const castDur = Math.max(250, 650 / (rod.castSpeed || 1));
+                setTimeout(() => {
+                    if (this.fishingState === 'CASTING') {
+                        this.fishingState = 'WAITING';
+                        this.hooks.forEach(h => {
+                            h.state = 'WAITING';
+                            if (!h.rippleSpawned) { this.ripples.push({ x: h.x, y: h.y, r: 0, alpha: 0.9 }); h.rippleSpawned = true; }
+                        });
+                    }
+                }, castDur);
+            }
+
+            rollFishData() {
+                const rod = CONFIG.rods[this.state.equippedRod];
+                const wd = WEATHERS[this.state.weather];
+                const pool = CONFIG.fishData.filter(f => f.area === this.state.currentArea && f.weightRange[0] <= rod.maxWeight);
+                if (!pool.length) return null;
+                const luck = rod.luckBonus + (this.state.upgrades.luck * 6) + wd.rareLuck + (this.state.upgrades.depth * 3);
+                const rolls = pool.map(f => ({ fish: f, weight: f.rarity === 'COMMON' ? CONFIG.rarities[f.rarity].weight : CONFIG.rarities[f.rarity].weight + luck }));
+                let r = Math.random() * rolls.reduce((a, b) => a + b.weight, 0), sel = rolls[0].fish;
+                for (let x of rolls) { if (r < x.weight) { sel = x.fish; break; } r -= x.weight; }
+                let w = parseFloat((Math.min(rod.maxWeight, sel.weightRange[0] + Math.random() * (sel.weightRange[1] - sel.weightRange[0]))).toFixed(2));
+                let base = Math.floor(sel.baseVal * CONFIG.areas[this.state.currentArea].fishMult * (w / sel.weightRange[0]));
+                base = Math.floor(base * wd.valueMult * (1 + this.state.upgrades.magnetism * 0.08));
+                if (this.state.activeBait && BAITS[this.state.activeBait]) base = Math.floor(base * BAITS[this.state.activeBait].valueMult);
+                const rd = CONFIG.rarities[sel.rarity];
+                let mc = 0.18 - (rd.index * 0.025), muts = [], mm = 1;
+                if (this.state.activeBait && BAITS[this.state.activeBait]) mc += BAITS[this.state.activeBait].mutChance;
+                while (Math.random() < mc && muts.length < 6) {
+                    let tw = MUTATIONS.reduce((s, m) => s + MUTATION_CLASSES[m.class].weight, 0);
+                    let mr = Math.random() * tw, sm = MUTATIONS.find(m => (mr -= MUTATION_CLASSES[m.class].weight) < 0) || MUTATIONS[0];
+                    if (!muts.find(x => x.name === sm.name)) { muts.push(sm); mm *= MUTATION_CLASSES[sm.class].mult; }
+                    mc *= 0.12;
+                }
+                return { template: sel, weight: w, mutations: muts, value: Math.floor(base * mm), diffMult: rd.diffMult * CONFIG.areas[this.state.currentArea].diffMult };
+            }
+
+            startMiniGame(hookCount) {
+                this.fishingState = 'REELING';
+                this.activeFishes = Array.from({ length: hookCount }, () => this.rollFishData());
+                document.getElementById('reeling-ui').style.display = 'block';
+                document.getElementById('fish-preview-reel').innerHTML = this.activeFishes.map(f => {
+                    if (!f) return '';
+                    const c = CONFIG.rarities[f.template.rarity].color;
+                    return `<div class="fish-chip" style="border-color:${c};color:${c}">${f.template.name}</div>`;
+                }).join('');
+                
+                const diff = Math.max(...this.activeFishes.map(f => f ? f.diffMult : 1)) + ((hookCount - 1) * 1.5);
+                const ll = this.state.upgrades.line;
+                const stabilizer = this.state.upgrades.stabilizer || 0;
+                
+                this.miniGame.maxProgress = 100 + (diff * 18);
+                this.miniGame.progress = this.miniGame.maxProgress * 0.22;
+                this.miniGame.drainRate = Math.max(1.2, (diff * 5) - (ll * 0.6));
+                this.miniGame.freezeTimer = 0; 
+                this.miniGame.zenTimer = 2.2;
+                
+                this.miniGame.targetWidth = Math.min(82, Math.max(5, 32 - (diff * 2.8) + (ll * 5)));
+                this.miniGame.targetStart = 8 + Math.random() * (82 - this.miniGame.targetWidth);
+                this.miniGame.perfectWidth = Math.max(2, this.miniGame.targetWidth * 0.28);
+                this.miniGame.perfectStart = this.miniGame.targetStart + (this.miniGame.targetWidth / 2) - (this.miniGame.perfectWidth / 2);
+                this.miniGame.cursor = 0; 
+                this.miniGame.dir = 1;
+                
+                let baseSpeed = 2.0 + (diff * 0.7);
+                let sizeFactor = Math.max(0.6, Math.min(1.4, 25 / this.miniGame.targetWidth));
+                let finalSpeed = baseSpeed * sizeFactor;
+                const stabilizerReduction = Math.min(0.7, stabilizer * 0.10);
+                finalSpeed = finalSpeed * (1 - stabilizerReduction);
+                finalSpeed = finalSpeed - (ll * 0.08);
+                this.miniGame.speed = Math.min(8.0, Math.max(0.4, finalSpeed));
+                
+                this._updateTimingUI();
+            }
+
+            _updateTimingUI() {
+                document.getElementById('timing-target').style.left = this.miniGame.targetStart + '%';
+                document.getElementById('timing-target').style.width = this.miniGame.targetWidth + '%';
+                document.getElementById('timing-perfect').style.left = ((this.miniGame.perfectStart - this.miniGame.targetStart) / this.miniGame.targetWidth * 100) + '%';
+                document.getElementById('timing-perfect').style.width = (this.miniGame.perfectWidth / this.miniGame.targetWidth * 100) + '%';
+            }
+
+            checkMiniGame() {
+                const pos = this.miniGame.cursor, ll = this.state.upgrades.line, g = 2.5;
+                const inGood = pos >= (this.miniGame.targetStart - g) && pos <= (this.miniGame.targetStart + this.miniGame.targetWidth + g);
+                const inPerf = pos >= (this.miniGame.perfectStart - g/2) && pos <= (this.miniGame.perfectStart + this.miniGame.perfectWidth + g/2);
+                const cx = this.canvas.width/2 + (Math.random()*50-25), cy = this.canvas.height/2-70;
+                
+                const stabilizer = this.state.upgrades.stabilizer || 0;
+                const difficultyBonus = Math.max(1, this.miniGame.speed / 2);
+                
+                if (inPerf) {
+                    let bonus = 38 + (ll * 6);
+                    bonus += stabilizer * 3 * difficultyBonus;
+                    this.miniGame.progress += bonus;
+                    this.miniGame.freezeTimer = 1.2;
+                    this.flashScreen('rgba(250,204,21,0.35)');
+                    this.createNotif("PERFECT!", cx, cy, "#facc15");
+                } else if (inGood) {
+                    let bonus = 16 + (ll * 3);
+                    bonus += stabilizer * 1.5 * difficultyBonus;
+                    this.miniGame.progress += bonus;
+                    this.miniGame.freezeTimer = 0.8;
+                    this.createNotif("Good!", cx, cy, "#4ade80");
+                } else {
+                    this.miniGame.progress -= 28;
+                    this.flashScreen('rgba(239,68,68,0.3)');
+                    this.createNotif("Miss!", cx, cy, "#ef4444");
+                }
+                
+                this.miniGame.targetStart = 8 + Math.random() * (82 - this.miniGame.targetWidth);
+                this.miniGame.perfectStart = this.miniGame.targetStart + (this.miniGame.targetWidth/2) - (this.miniGame.perfectWidth/2);
+                this._updateTimingUI();
+                
+                if (this.miniGame.progress >= this.miniGame.maxProgress) this.catchFish();
+                else if (this.miniGame.progress <= 0) this.escapeFish();
+            }
+
+            catchFish() {
+                let tot = 0;
+                const now = Date.now();
+                if (now - this.lastCatchTime < 8000) this.combo++; else this.combo = 1;
+                this.lastCatchTime = now;
+                if (this.combo > this.state.bestCombo) this.state.bestCombo = this.combo;
+                this.activeFishes.forEach((f, i) => {
+                    if (!f) return;
+                    let v = f.value;
+                    if (Math.random() * 100 < (this.state.upgrades.luck * 2.5)) v = Math.floor(v * 2);
+                    if (this.combo >= 3) v = Math.floor(v * (1 + (this.combo - 1) * 0.1));
+                    tot += v; this.state.totalCaught++; this.state.totalEarned += v;
+                    const fn = f.mutations.map(m => m.name).join(" ") + (f.mutations.length ? " " : "") + f.template.name;
+                    this.showFishNotification(f, v);
+                    this.addXP(10 + Math.floor(v / 100));
+                    let sx = this.canvas.width / 2;
+                    if (this.bittenHooksPositions[i]) sx = this.bittenHooksPositions[i].x;
+                    let vs = Math.min(130, 16 + Math.sqrt(f.weight) * 3.2);
+                    this.yankedFishes.push({ x: sx, y: this.canvas.height * 0.7, vx: (Math.random() - 0.5) * 9, vy: -9 - Math.random() * 11, fishData: f, life: 1.0, size: vs, rotation: (Math.random() - 0.5) * 0.5, rotSpeed: (Math.random() - 0.5) * 0.12 });
+                    this.addToEncyclopedia(f, fn, v);
+                    this.log(fn + ' — $' + v.toLocaleString(), CONFIG.rarities[f.template.rarity].color);
+                });
+                this.state.money += tot;
+                if (this.state.totalCaught % 8 === 0) this.levelUp();
+                if (this.combo >= 3) this.showComboPopup(this.combo + 'x COMBO!', '#facc15');
+                if (this.activeFishes.length > 1) this.createNotif('MULTI! ×' + this.activeFishes.length, this.canvas.width / 2, this.canvas.height / 2 + 50, "#38bdf8");
+                this.hooks.forEach(h => this.spawnSplash(h.x, h.y, 18));
+                if (this.state.activeBait) {
+                    this.state.baitUses--;
+                    if (this.state.baitUses <= 0) { this.log(this.state.activeBait + ' bait used up!', '#f87171'); this.state.activeBait = null; this.state.baitUses = 0; }
+                }
+                document.getElementById('reeling-ui').style.display = 'none';
+                this.fishingState = 'IDLE'; this.activeFishes = [];
+                this.updateUI(); this.renderShop();
+            }
+
+            escapeFish() {
+                this.log("Line snapped — fish escaped!", "#ef4444");
+                document.getElementById('reeling-ui').style.display = 'none';
+                this.fishingState = 'IDLE'; this.activeFishes = []; this.combo = 0;
+            }
+
+            addXP(a) {
+                const areaMult = Math.max(0.3, Math.min(1.5, 1 / (CONFIG.areas[this.state.currentArea].diffMult || 1)));
+                const scaledXP = Math.floor(a * areaMult);
+                this.state.xp += scaledXP;
+                const needed = this.state.level * 100;
+                if (this.state.xp >= needed) { this.state.xp -= needed; this.levelUp(); }
+                const pct = Math.min(100, (this.state.xp / (this.state.level * 100)) * 100);
+                document.getElementById('xp-bar-fill').style.width = pct + '%';
+            }
+
+            levelUp() {
+                this.state.level++;
+                this.createNotif("LEVEL UP! Lv." + this.state.level, this.canvas.width / 2, this.canvas.height / 3, "#4ade80");
+                this.log("Level Up! Now Lv." + this.state.level, "#4ade80");
+                this.updateUI();
+            }
+
+            showComboPopup(text, color) {
+                const el = document.createElement('div'); el.className = 'combo-popup'; el.style.color = color; el.textContent = text;
+                document.body.appendChild(el); setTimeout(() => el.remove(), 1300);
+            }
+
+            showFishNotification(fish, finalValue) {
+                const c = document.getElementById('notification-container');
+                if (c.children.length >= 4) c.removeChild(c.firstChild);
+                const n = document.createElement('div'); n.className = 'fish-notif';
+                let hc = CONFIG.rarities[fish.template.rarity].color;
+                fish.mutations.forEach(m => { if (MUTATION_CLASSES[m.class].id > 3) hc = MUTATION_CLASSES[m.class].color; });
+                n.style.borderLeftColor = hc;
+                let mh = fish.mutations.slice(0, 3).map(m => `<span class="mut-tag" style="background:${MUTATION_CLASSES[m.class].color}">${m.name}</span>`).join('');
+                n.innerHTML = `<div class="fn-name" style="color:${hc}">${fish.template.name}</div>${mh ? `<div class="fn-muts">${mh}</div>` : ''}<div class="fn-wt">⚖️ ${fish.weight}kg</div><div class="fn-val">💵 +$${finalValue.toLocaleString()}</div>`;
+                c.appendChild(n); setTimeout(() => { if (n.parentNode) n.remove(); }, 5100);
+            }
+
+            addToEncyclopedia(fd, fn, vc) {
+                const id = fd.template.name + '_' + fd.mutations.map(m => m.name).sort().join('_');
+                let ex = this.state.encyclopedia.find(e => e.id === id);
+                if (!ex) this.state.encyclopedia.push({ id, name: fn, baseFishName: fd.template.name, fishRarity: fd.template.rarity, mutations: fd.mutations, maxWeight: fd.weight, maxValue: vc, areaCaught: CONFIG.areas[this.state.currentArea].name, count: 1 });
+                else { ex.count++; if (fd.weight > ex.maxWeight) ex.maxWeight = fd.weight; if (vc > ex.maxValue) ex.maxValue = vc; }
+                if (this.encOpen) this.renderEncyclopedia();
+            }
+
+            toggleEncyclopedia() {
+                this.encOpen = !this.encOpen;
+                document.getElementById('encyclopedia-panel').style.display = this.encOpen ? 'flex' : 'none';
+                if (this.encOpen) this.renderEncyclopedia();
+            }
+
+            sortEnc(mode) {
+                this.encSortMode = mode;
+                document.querySelectorAll('.enc-sort-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById({ mutation: 'sort-mut', rarity: 'sort-rare', value: 'sort-val' }[mode]).classList.add('active');
+                this.renderEncyclopedia();
+            }
+
+            renderEncyclopedia() {
+                const grid = document.getElementById('enc-grid'); grid.innerHTML = '';
+                let list = [...this.state.encyclopedia].sort((a, b) => {
+                    if (this.encSortMode === 'mutation') {
+                        let am = a.mutations.length > 0 ? Math.max(...a.mutations.map(m => MUTATION_CLASSES[m.class].id)) : -1;
+                        let bm = b.mutations.length > 0 ? Math.max(...b.mutations.map(m => MUTATION_CLASSES[m.class].id)) : -1;
+                        return am !== bm ? bm - am : b.maxValue - a.maxValue;
+                    } else if (this.encSortMode === 'rarity') {
+                        let ar = CONFIG.rarities[a.fishRarity].index, br = CONFIG.rarities[b.fishRarity].index;
+                        return ar !== br ? br - ar : b.maxValue - a.maxValue;
+                    } return b.maxValue - a.maxValue;
+                });
+                list.forEach(item => {
+                    let bc = CONFIG.rarities[item.fishRarity].color;
+                    item.mutations.forEach(m => { if (MUTATION_CLASSES[m.class].id > 3) bc = MUTATION_CLASSES[m.class].color; });
+                    const tc = document.createElement('canvas'); tc.width = 160; tc.height = 90;
+                    const tx = tc.getContext('2d');
+                    this.drawFishEntity(tx, 80, 45, Math.min(32, 16 + Math.sqrt(item.maxWeight) * 2), item, 1);
+                    grid.innerHTML += `<div class="enc-card" style="border-color:${bc};box-shadow:0 4px 14px ${bc}22">
+                        <div class="enc-title" style="color:${bc}">${item.name}</div>
+                        <img src="${tc.toDataURL()}" style="display:block;margin:7px auto;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.6));max-width:100%;height:auto;">
+                        <div>${item.mutations.map(m => `<span class="mut-tag" style="background:${MUTATION_CLASSES[m.class].color}">${m.name}</span>`).join('')}</div>
+                        <div style="font-size:0.75rem;color:#888;margin-top:6px">⚖️ ${item.maxWeight}kg &nbsp;·&nbsp; 📍 ${item.areaCaught}</div>
+                        <div style="font-size:0.75rem;color:#888">💵 <span style="color:#facc15">$${item.maxValue.toLocaleString()}</span> &nbsp;·&nbsp; ×${item.count}</div>
+                    </div>`;
+                });
+                if (!list.length) grid.innerHTML = '<div style="color:#444;font-style:italic;padding:20px;text-align:center">Cast a line to fill your index!</div>';
+            }
+
+            abbreviate(n) {
+                if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+                if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+                if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+                return n.toLocaleString();
+            }
+
+            updateUI() {
+                document.getElementById('money-display').innerText = this.abbreviate(Math.floor(this.state.money));
+                document.getElementById('current-area-name').innerText = CONFIG.areas[this.state.currentArea].emoji + ' ' + CONFIG.areas[this.state.currentArea].name;
+                document.getElementById('level-display').innerText = this.state.level;
+                document.getElementById('level-badge-value').innerText = this.state.level;
+                document.getElementById('total-caught-display').innerText = this.state.totalCaught;
+                document.getElementById('total-earned-display').innerText = '$' + this.abbreviate(this.state.totalEarned);
+                document.getElementById('best-combo-display').innerText = this.state.bestCombo + 'x';
+                const rod = CONFIG.rods[this.state.equippedRod];
+                document.getElementById('stat-rod').innerText = rod.name;
+                document.getElementById('stat-hooks').innerText = rod.hooks;
+                document.getElementById('stat-luck').innerText = '+' + (rod.luckBonus + (this.state.upgrades.luck * 6)) + '%';
+                document.getElementById('stat-auto').innerText = this.state.upgrades.auto > 0 ? 'Lv.' + this.state.upgrades.auto : 'Off';
+                const wd = WEATHERS[this.state.weather];
+                document.getElementById('weather-display').innerText = this.state.weather;
+                document.getElementById('weather-effect-display').innerText = wd.desc;
+                document.getElementById('weather-banner').innerText = wd.emoji + ' ' + this.state.weather;
+                document.getElementById('weather-banner').style.color = this.state.weather === 'Bloodmoon' ? '#ef4444' : this.state.weather === 'Eclipse' ? '#818cf8' : this.state.weather === 'Blizzard' ? '#bae6fd' : '#e2e8f0';
+                document.getElementById('xp-bar-fill').style.width = Math.min(100, (this.state.xp / (this.state.level * 100)) * 100) + '%';
+            }
+
+            renderShop() {
+                // RODS
+                let rh = '';
+                CONFIG.rods.forEach((rod, i) => {
+                    const owned = this.state.ownedRods.includes(i);
+                    const eqd = this.state.equippedRod === i;
+                    const af = this.state.money >= rod.cost || rod.cost === 0;
+                    const requiredLevel = Math.floor(i * 3) + 1;
+                    const canAfford = this.state.level >= requiredLevel && (af || owned);
+                    
+                    const displayName = owned ? rod.name : `??? (Level ${requiredLevel})`;
+                    const displayDesc = owned ? rod.desc : "???";
+                    const displayHooks = owned ? rod.hooks : "?";
+                    const displayWeight = owned ? (rod.maxWeight >= 1000 ? (rod.maxWeight / 1000).toFixed(0) + 't' : rod.maxWeight + 'kg') : "???";
+                    const displayLinger = owned ? (rod.linger / 1000).toFixed(1) + 's' : "???";
+                    const displayLuck = owned ? `+${rod.luckBonus}%` : "???";
+                    
+                    rh += `<div class="upgrade-item" style="opacity: ${owned ? 1 : 0.7}">
+                        <div class="item-header" style="color:${eqd ? '#00b0f0' : (owned ? '#fff' : '#888')}">
+                            ${displayName}${eqd ? ' <span style="font-size:0.64rem;color:#00b0f0">[EQUIPPED]</span>' : ''}
+                            ${!owned ? `<span style="font-size:0.6rem;color:#facc15;margin-left:8px"><i class="fa-solid fa-lock"></i> Locked</span>` : ''}
+                        </div>
+                        <div class="item-stats">
+                            <i class="fa-solid fa-anchor"></i> ${displayHooks} hooks &nbsp;·&nbsp;
+                            <i class="fa-solid fa-weight-hanging"></i> ${displayWeight}<br>
+                            <i class="fa-regular fa-clock"></i> ${displayLinger} linger &nbsp;·&nbsp;
+                            <i class="fa-solid fa-clover"></i> ${displayLuck}<br>
+                            <span style="color:#666">${displayDesc}</span>
+                            ${!owned ? `<span style="color:#facc15;font-size:0.7rem;display:block;margin-top:4px"><i class="fa-solid fa-star"></i> Required: Level ${requiredLevel}</span>` : ''}
+                        </div>
+                        ${eqd ? `<button class="btn-equipped" disabled><i class="fa-solid fa-check"></i> Equipped</button>`
+                            : owned ? `<button class="btn-equip" onclick="game.equipRod(${i})"><i class="fa-solid fa-rotate"></i> Equip</button>`
+                                : `<button class="btn-buy" ${!canAfford ? 'disabled' : ''} onclick="game.buyRod(${i},${rod.cost})">
+                                    <i class="fa-solid fa-cart-shopping"></i> Buy — $${rod.cost.toLocaleString()}
+                                    ${this.state.level < requiredLevel ? ` (Need Lvl ${requiredLevel})` : ''}
+                                   </button>`}
+                    </div>`;
+                });
+                document.getElementById('rods-list').innerHTML = rh;
+
+                // SKILLS
+                const UPGS = [
+                    { id: 'line', name: 'Braided Line', desc: 'Widens catch zone per level', icon: 'fa-solid fa-rope', base: 100 },
+                    { id: 'reel', name: 'High-Speed Reel', desc: 'Fish bite faster per level', icon: 'fa-solid fa-gear', base: 150 },
+                    { id: 'luck', name: 'Shiny Lure', desc: '+6% rare luck per level', icon: 'fa-solid fa-star', base: 200 },
+                    { id: 'auto', name: 'Fishing Net', desc: 'Passive income every 3 seconds', icon: 'fa-solid fa-fish-fins', base: 1000 },
+                    { id: 'depth', name: 'Deep-Sea Sonar', desc: '+3% rare luck & bigger fish', icon: 'fa-solid fa-satellite-dish', base: 500 },
+                    { id: 'sonar', name: 'Bite Sensor', desc: 'Reduces wait time significantly', icon: 'fa-solid fa-wifi', base: 800 },
+                    { id: 'stormgear', name: 'Storm Gear', desc: 'Extends bite window in harsh weather', icon: 'fa-solid fa-shield', base: 600 },
+                    { id: 'magnetism', name: 'Value Magnetism', desc: '+8% sell value per level', icon: 'fa-solid fa-magnet', base: 2000 },
+                    { id: 'netweave', name: 'Net Weave', desc: 'Auto-fisher catches rarer fish', icon: 'fa-solid fa-network-wired', base: 5000 },
+                    { id: 'stabilizer', name: 'Cursor Stabilizer', desc: 'Slows cursor speed during reeling (-10% per level)', icon: 'fa-solid fa-gauge-high', base: 300 }
+                ];
+                let uh = '';
+                UPGS.forEach(u => {
+                    const lv = this.state.upgrades[u.id] || 0, cost = Math.floor(u.base * Math.pow(1.85, lv));
+                    uh += `<div class="upgrade-item">
+                        <div class="item-header"><i class="${u.icon}"></i> &nbsp;${u.name} <span style="color:#00b0f0;font-size:0.8rem;font-weight:normal">Lv.${lv}</span></div>
+                        <div class="item-stats">${u.desc}</div>
+                        <button class="btn-buy" ${this.state.money < cost ? 'disabled' : ''} onclick="game.buyUpgrade('${u.id}',${cost})">
+                            <i class="fa-solid fa-arrow-up"></i> Upgrade — $${cost.toLocaleString()}</button>
+                    </div>`;
+                });
+                document.getElementById('upgrades-list').innerHTML = uh;
+
+                // BAIT
+                let bh = '';
+                Object.entries(BAITS).forEach(([name, b]) => {
+                    const active = this.state.activeBait === name;
+                    const aff = this.state.money >= b.cost;
+                    bh += `<div class="upgrade-item">
+                        <div class="item-header" style="color:${active ? '#4ade80' : '#fff'}">${b.emoji} ${name}${active ? ` <span style="font-size:0.64rem;color:#4ade80">[ACTIVE: ${this.state.baitUses} left]</span>` : ''}</div>
+                        <div class="item-stats">${b.desc}</div>
+                        ${active ? `<button class="btn-equipped" disabled>Active</button>`
+                            : `<button class="btn-buy" ${!aff ? 'disabled' : ''} onclick="game.buyBait('${name}')"><i class="fa-solid fa-cart-shopping"></i> Buy — $${b.cost.toLocaleString()}</button>`}
+                    </div>`;
+                });
+                document.getElementById('bait-list').innerHTML = bh;
+
+                // AREAS
+                let ah = '';
+                CONFIG.areas.forEach((area, i) => {
+                    const ul = this.state.unlockedAreas.includes(i);
+                    const cu = this.state.level >= area.minLevel && this.state.money >= area.unlockCost;
+                    const ia = this.state.currentArea === i;
+                    const displayName = ul ? `${area.emoji} ${area.name}` : `${area.emoji} ???`;
+                    const displayMult = ul ? `×${area.fishMult}` : "???";
+                    
+                    if (ul) {
+                        ah += `<div class="upgrade-item">
+                            <div class="item-header" style="color:${ia ? '#4ade80' : '#fff'}">${displayName}</div>
+                            <div class="item-stats"><i class="fa-solid fa-arrow-trend-up"></i> ${displayMult} value &nbsp;·&nbsp; <i class="fa-solid fa-user"></i> Lv.${area.minLevel}+</div>
+                            <button class="${ia ? 'btn-equipped' : 'btn-equip'}" ${ia ? 'disabled' : ''} onclick="game.travelTo(${i})">
+                                ${ia ? '<i class="fa-solid fa-location-dot"></i> Current' : '<i class="fa-solid fa-sailboat"></i> Travel Here'}</button>
+                        </div>`;
+                    } else {
+                        ah += `<div class="upgrade-item" style="opacity:0.65">
+                            <div class="item-header" style="color:#444">${displayName}</div>
+                            <div class="item-stats"><i class="fa-solid fa-lock"></i> Lv.${area.minLevel} &nbsp;·&nbsp; $${area.unlockCost.toLocaleString()}</div>
+                            <button class="btn-buy" ${!cu ? 'disabled' : ''} onclick="game.unlockArea(${i},${area.unlockCost})">
+                                <i class="fa-solid fa-unlock"></i> Unlock — $${area.unlockCost.toLocaleString()}
+                                ${this.state.level < area.minLevel ? ` (Need Lvl ${area.minLevel})` : ''}
+                            </button>
+                        </div>`;
+                    }
+                });
+                document.getElementById('areas-list').innerHTML = ah;
+            }
+
+            buyRod(i, cost) { 
+                const rod = CONFIG.rods[i];
+                const requiredLevel = Math.floor(i * 3) + 1;
+                
+                if (this.state.level < requiredLevel) {
+                    this.log(`Need level ${requiredLevel} to buy ${rod.name}!`, "#f87171");
+                    return;
+                }
+                
+                if (this.state.money >= cost && !this.state.ownedRods.includes(i)) { 
+                    this.state.money -= cost; 
+                    this.state.ownedRods.push(i); 
+                    this.state.equippedRod = i; 
+                    this.updateUI(); 
+                    this.renderShop(); 
+                    this.log('Bought ' + CONFIG.rods[i].name + '!', '#4ade80'); 
+                } 
+            }
+            
+            equipRod(i) { 
+                const rod = CONFIG.rods[i];
+                const requiredLevel = Math.floor(i * 3) + 1;
+                
+                if (this.state.level < requiredLevel) {
+                    this.log(`Cannot equip ${rod.name} - Need level ${requiredLevel}!`, "#f87171");
+                    return;
+                }
+                
+                if (this.state.ownedRods.includes(i)) { 
+                    this.state.equippedRod = i; 
+                    this.updateUI(); 
+                    this.renderShop(); 
+                    this.log(`Equipped ${rod.name}!`, '#4ade80');
+                } 
+            }
+            
+            buyUpgrade(id, cost) { 
+                if (this.state.money >= cost) { 
+                    this.state.money -= cost; 
+                    if (!this.state.upgrades[id]) this.state.upgrades[id] = 0; 
+                    this.state.upgrades[id]++; 
+                    this.updateUI(); 
+                    this.renderShop(); 
+                    this.log('Upgraded!', '#4ade80'); 
+                } 
+            }
+            
+            buyBait(name) { 
+                const b = BAITS[name]; 
+                if (this.state.money >= b.cost) { 
+                    this.state.money -= b.cost; 
+                    this.state.activeBait = name; 
+                    this.state.baitUses = b.maxUses; 
+                    this.updateUI(); 
+                    this.renderShop(); 
+                } 
+            }
+            
+            travelTo(i) { 
+                const area = CONFIG.areas[i];
+                if (this.state.level < area.minLevel) {
+                    this.log(`Need level ${area.minLevel} to travel to ${area.name}!`, "#f87171");
+                    return;
+                }
+                this.state.currentArea = i; 
+                this.updateUI(); 
+                this.renderShop(); 
+            }
+            
+            unlockArea(i, cost) { 
+                const area = CONFIG.areas[i];
+                if (this.state.level < area.minLevel) {
+                    this.log(`Need level ${area.minLevel} to unlock ${area.name}!`, "#f87171");
+                    return;
+                }
+                if (this.state.money >= cost) { 
+                    this.state.money -= cost; 
+                    this.state.unlockedAreas.push(i); 
+                    this.state.currentArea = i; 
+                    this.updateUI(); 
+                    this.renderShop(); 
+                } 
+            }
+
+            log(msg, color = '#94a3b8') {
+                const tc = document.getElementById('toast-container');
+                const e = document.createElement('div'); e.className = 'game-toast'; e.style.color = color; e.innerText = msg;
+                tc.prepend(e); setTimeout(() => e.remove(), 2800);
+                while (tc.childNodes.length > 3) tc.removeChild(tc.lastChild);
+            }
+
+            spawnSplash(x, y, n) {
+                for (let i = 0; i < n; i++) this.particles.push({ x, y, vx: (Math.random() - 0.5) * 10, vy: -3 - Math.random() * 7, life: 1, color: `hsl(${200 + Math.random() * 40},80%,70%)` });
+            }
+
+            createNotif(text, x, y, color) {
+                const n = document.createElement('div'); n.className = 'notif'; n.style.left = x + 'px'; n.style.top = y + 'px'; n.style.color = color; n.innerText = text;
+                document.body.appendChild(n); setTimeout(() => n.remove(), 1500);
+            }
+
+            flashScreen(color) { const f = document.getElementById('flash-overlay'); f.style.background = color; f.style.opacity = '1'; setTimeout(() => f.style.opacity = '0', 90); }
+
+            save() { 
+                if (this.currentSlot) {
+                    SaveSlotManager.saveSlot(this.currentSlot, this.state);
+                } else {
+                    const defaultSlot = `Fisher_${Date.now().toString().slice(-6)}`;
+                    SaveSlotManager.saveSlot(defaultSlot, this.state);
+                    this.currentSlot = defaultSlot;
+                }
+            }
+            
+            load() {
+                const currentSlot = SaveSlotManager.getCurrentSlot();
+                if (currentSlot) {
+                    const savedState = SaveSlotManager.loadSlot(currentSlot);
+                    if (savedState) {
+                        this.state = { ...this.getDefaultState(), ...savedState };
+                        if (!this.state.upgrades.stabilizer) this.state.upgrades.stabilizer = 0;
+                        this.currentSlot = currentSlot;
+                    }
+                } else {
+                    const oldSave = localStorage.getItem('zenFisher3');
+                    if (oldSave) {
+                        this.loadFromOldSave();
+                    }
+                }
+            }
+            
+            resetGame() { 
+                if (confirm("Reset current save? This cannot be undone!")) { 
+                    if (this.currentSlot) {
+                        SaveSlotManager.deleteSlot(this.currentSlot);
+                    }
+                    this.state = this.getDefaultState();
+                    this.currentSlot = null;
+                    this.updateUI(); 
+                    this.renderShop();
+                    this.log("Save reset! Create a new save to continue.", "#facc15");
+                    this.showSaveSlots();
+                } 
+            }
+
+            // Drawing methods (simplified for length - same as original)
+            loop(ts) {
+                const dt = Math.min(ts - this.lastTime, 80); this.lastTime = ts;
+                this.update(dt, ts); this.draw(ts);
+                requestAnimationFrame(t => this.loop(t));
+            }
+
+            update(dt, ts) {
+                this.waveOffset += dt * 0.0008;
+                this.castArcProg = Math.min(1, this.castArcProg + dt * 0.003);
+
+                if (this.state.upgrades.auto > 0) {
+                    this.autoFisherTimer += dt;
+                    if (this.autoFisherTimer > 3000) {
+                        const gain = this.state.upgrades.auto * (5 + (this.state.upgrades.netweave || 0) * 2) * CONFIG.areas[this.state.currentArea].fishMult * WEATHERS[this.state.weather].valueMult;
+                        this.state.money += gain; this.state.totalEarned += gain;
+                        this.autoFisherTimer = 0; this.updateUI();
+                    }
+                }
+
+                const wd = WEATHERS[this.state.weather];
+                if (wd.rain || wd.snow) for (let i = 0; i < 3; i++) this.spawnWP();
+                for (let i = this.weatherParticles.length - 1; i >= 0; i--) {
+                    const p = this.weatherParticles[i]; p.x += p.vx; p.y += p.vy;
+                    if (p.y > this.canvas.height + 10) this.weatherParticles.splice(i, 1);
+                }
+                if (this.weatherParticles.length > 350) this.weatherParticles.splice(0, 60);
+
+                if (wd.lightning && Math.random() < dt * 0.00015) { this.lightningFlash = 0.9; this.flashScreen('rgba(150,150,255,0.2)'); }
+                if (this.lightningFlash > 0) this.lightningFlash = Math.max(0, this.lightningFlash - dt * 0.005);
+
+                for (let i = this.ripples.length - 1; i >= 0; i--) {
+                    const rp = this.ripples[i]; rp.r += dt * 0.06; rp.alpha -= dt * 0.0006;
+                    if (rp.alpha <= 0) this.ripples.splice(i, 1);
+                }
+
+                for (let i = this.yankedFishes.length - 1; i >= 0; i--) {
+                    const yf = this.yankedFishes[i];
+                    yf.x += yf.vx; yf.vy += 0.45 * (dt / 16.66); yf.y += yf.vy * (dt / 16.66);
+                    yf.rotation += yf.rotSpeed * (dt / 16.66); yf.life -= dt / 2800;
+                    if (yf.life <= 0) this.yankedFishes.splice(i, 1);
+                }
+
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const p = this.particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.life -= dt * 0.025;
+                    if (p.life <= 0) this.particles.splice(i, 1);
+                }
+
+                if (this.fishingState === 'IDLE') return;
+
+                let anyBites = false, allEsc = true;
+                this.hooks.forEach(h => {
+                    h.offset = Math.sin(ts / 600) * 6; h.bobble = Math.sin(ts / 280) * 2.5;
+                    if (h.state === 'CASTING') { h.y += (h.targetY - h.y) * 0.12; allEsc = false; }
+                    else if (h.state === 'WAITING') {
+                        allEsc = false; h.biteTimer -= dt;
+                        if (h.biteTimer <= 0) { h.state = 'BITE'; this.fishingState = 'BITE'; this.spawnSplash(h.x, h.y, 16); h.biteWindow = h.lingerTime; this.ripples.push({ x: h.x, y: h.y, r: 0, alpha: 1 }); }
+                    } else if (h.state === 'BITE') {
+                        allEsc = false; anyBites = true; h.biteWindow -= dt;
+                        if (h.biteWindow <= 0) { h.state = 'ESCAPED'; this.spawnSplash(h.x, h.y, 8); }
+                    }
+                });
+                if (this.fishingState === 'BITE' && !anyBites && allEsc) { this.fishingState = 'IDLE'; this.log("It got away...", "#94a3b8"); this.combo = 0; }
+                else if (this.fishingState === 'REELING') {
+                    this.miniGame.cursor += this.miniGame.speed * this.miniGame.dir * (dt / 16.66);
+                    if (this.miniGame.cursor > 100 || this.miniGame.cursor < 0) { this.miniGame.dir *= -1; this.miniGame.cursor = Math.max(0, Math.min(100, this.miniGame.cursor)); }
+                    document.getElementById('timing-cursor').style.left = this.miniGame.cursor + '%';
+                    if (this.miniGame.zenTimer > 0) this.miniGame.zenTimer -= dt / 1000;
+                    else if (this.miniGame.freezeTimer > 0) this.miniGame.freezeTimer -= dt / 1000;
+                    else this.miniGame.progress -= this.miniGame.drainRate * (dt / 1000);
+                    if (this.miniGame.progress <= 0) this.escapeFish();
+                    const pct = Math.max(0, Math.min(100, (this.miniGame.progress / this.miniGame.maxProgress) * 100));
+                    document.getElementById('catch-progress-fill').style.width = pct + '%';
+                    document.getElementById('catch-pct').innerText = Math.floor(pct) + '%';
+                }
+            }
+
+            draw(ts) {
+                const ctx = this.ctx, w = this.canvas.width, h = this.canvas.height;
+                const area = CONFIG.areas[this.state.currentArea];
+                const wd = WEATHERS[this.state.weather];
+
+                const g = ctx.createLinearGradient(0, 0, 0, h);
+                g.addColorStop(0, area.skyTop); g.addColorStop(0.55, area.skyMid); g.addColorStop(1, area.skyBot);
+                ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+
+                if (area.skyTop === '#000000' || area.skyTop === '#050514' || area.skyTop === '#020617') {
+                    ctx.save();
+                    for (let i = 0; i < 90; i++) {
+                        const sx = (i * 137.5) % w, sy = (i * 97.3) % (h * 0.5);
+                        const pulse = 0.4 + 0.6 * Math.sin(ts / 900 + i);
+                        ctx.fillStyle = `rgba(255,255,255,${pulse * 0.75})`; ctx.fillRect(sx, sy, 1.5, 1.5);
+                    }
+                    ctx.restore();
+                }
+
+                if (this.state.weather === 'Bloodmoon' || this.state.weather === 'Eclipse') {
+                    const col = this.state.weather === 'Bloodmoon' ? '#ef4444' : '#4338ca';
+                    const glow = this.state.weather === 'Bloodmoon' ? '#b91c1c' : '#312e81';
+                    ctx.save(); ctx.shadowBlur = 50; ctx.shadowColor = glow;
+                    ctx.beginPath(); ctx.arc(w * 0.82, h * 0.1, 26, 0, Math.PI * 2); ctx.fillStyle = col; ctx.fill();
+                    ctx.restore();
+                }
+
+                const waterY = h * 0.52;
+                const wg = ctx.createLinearGradient(0, waterY, 0, h);
+                wg.addColorStop(0, area.waterCol + 'dd'); wg.addColorStop(0.6, area.waterCol + '88'); wg.addColorStop(1, '#000000');
+                ctx.fillStyle = wg; ctx.fillRect(0, waterY, w, h - waterY);
+
+                for (let layer = 0; layer < 4; layer++) {
+                    const speed = [1, 1.7, 2.5, 3.2][layer], amp = [10, 6, 4, 2.5][layer], alpha = [0.18, 0.12, 0.07, 0.04][layer];
+                    ctx.beginPath(); ctx.moveTo(0, waterY);
+                    for (let x = 0; x <= w; x += 5) {
+                        const y = waterY + amp * Math.sin((x / w) * Math.PI * 4 + this.waveOffset * speed + layer * 1.3);
+                        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                    }
+                    ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
+                    ctx.fillStyle = `rgba(255,255,255,${alpha})`; ctx.fill();
+                }
+
+                ctx.save();
+                for (let i = 0; i < 14; i++) {
+                    const sx = ((i * w / 13) + Math.sin(ts / 1200 + i) * 25 + this.waveOffset * 20) % w;
+                    const sy = waterY + 8 + Math.sin(ts / 800 + i * 1.5) * 22;
+                    ctx.fillStyle = `rgba(255,255,255,${0.06 + 0.1 * Math.sin(ts / 500 + i)})`;
+                    ctx.fillRect(sx, sy, Math.sin(ts / 700 + i) * 28 + 38, 1.5);
+                }
+                ctx.restore();
+
+                ctx.save(); ctx.globalAlpha = 0.055 + 0.03 * Math.sin(ts / 2000);
+                for (let i = 0; i < 6; i++) {
+                    const fx = ((i * w * 0.2) + ts * 0.007 * (i % 2 === 0 ? 1 : -0.7)) % w;
+                    const fy = waterY + 50 + i * 28 + Math.sin(ts / 1600 + i) * 18;
+                    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(fx, fy, 13 + i * 2, 5, 0, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.moveTo(fx - 13, fy); ctx.lineTo(fx - 20, fy - 4); ctx.lineTo(fx - 20, fy + 4); ctx.fill();
+                }
+                ctx.restore();
+
+                this.ripples.forEach(rp => {
+                    ctx.save(); ctx.beginPath(); ctx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(255,255,255,${rp.alpha})`; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore();
+                });
+
+                this.weatherParticles.forEach(p => {
+                    ctx.save(); ctx.globalAlpha = p.alpha * 0.65;
+                    if (p.sn) { ctx.fillStyle = '#e0f2fe'; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill(); }
+                    else { ctx.strokeStyle = 'rgba(147,197,253,0.8)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + p.vx * 2, p.y + p.vy * 0.55); ctx.stroke(); }
+                    ctx.restore();
+                });
+
+                if (this.lightningFlash > 0.25) {
+                    ctx.save(); ctx.globalAlpha = this.lightningFlash * 0.9; ctx.strokeStyle = '#ddd6fe'; ctx.lineWidth = 2;
+                    ctx.shadowBlur = 25; ctx.shadowColor = '#818cf8';
+                    const lx = w * 0.35 + Math.random() * w * 0.3;
+                    ctx.beginPath(); ctx.moveTo(lx, 0);
+                    let cy2 = 0;
+                    while (cy2 < waterY) { cy2 += 15 + Math.random() * 25; ctx.lineTo(lx + (Math.random() - 0.5) * 35, cy2); }
+                    ctx.stroke(); ctx.restore();
+                }
+
+                if (wd.fogAlpha > 0) {
+                    const fg = ctx.createLinearGradient(0, waterY - 80, 0, waterY + 120);
+                    fg.addColorStop(0, 'rgba(180,200,220,0)'); fg.addColorStop(0.5, `rgba(180,200,220,${wd.fogAlpha})`); fg.addColorStop(1, 'rgba(180,200,220,0)');
+                    ctx.fillStyle = fg; ctx.fillRect(0, waterY - 80, w, 200);
+                }
+
+                this.yankedFishes.forEach(yf => {
+                    ctx.save(); ctx.translate(yf.x, yf.y); ctx.rotate(yf.rotation);
+                    this.drawFishEntity(ctx, 0, 0, yf.size, yf.fishData, yf.life); ctx.restore();
+                });
+
+                if (this.fishingState !== 'IDLE' && this.hooks && this.hooks.length) {
+                    const rodTipX = w * 0.5, rodTipY = h * 0.16;
+                    this.hooks.forEach(hook => {
+                        if (hook.state === 'ESCAPED') return;
+                        const bx = hook.x;
+                        const by = hook.y + (hook.state === 'WAITING' || hook.state === 'BITE' ? hook.offset + hook.bobble : 0);
+                        ctx.beginPath();
+                        const cx2 = (rodTipX + bx) / 2 + Math.sin(ts / 900) * 18;
+                        const cy2 = rodTipY + (by - rodTipY) * 0.35 - 25;
+                        ctx.moveTo(rodTipX, rodTipY); ctx.quadraticCurveTo(cx2, cy2, bx, by);
+                        ctx.strokeStyle = `rgba(220,218,210,${hook.state === 'BITE' ? 0.9 : 0.5})`; ctx.lineWidth = 1.5; ctx.stroke();
+                        const biting = hook.state === 'BITE';
+                        ctx.save(); ctx.translate(bx, by);
+                        if (biting) ctx.rotate(Math.sin(ts / 75) * 0.35);
+                        if (biting) { ctx.shadowBlur = 18; ctx.shadowColor = '#ef4444'; }
+                        else { ctx.shadowBlur = 8; ctx.shadowColor = '#60a5fa'; }
+                        ctx.fillStyle = biting ? '#ef4444' : '#f0ede8';
+                        ctx.beginPath(); ctx.ellipse(0, 0, 9, 4.5, 0, 0, Math.PI * 2); ctx.fill();
+                        ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.beginPath(); ctx.ellipse(-1, -1.5, 4, 2, 0.4, 0, Math.PI * 2); ctx.fill();
+                        ctx.fillStyle = biting ? '#fca5a5' : '#93c5fd';
+                        ctx.beginPath(); ctx.moveTo(-9, 0); ctx.lineTo(-15, -5); ctx.lineTo(-15, 5); ctx.closePath(); ctx.fill();
+                        ctx.shadowBlur = 0; ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5;
+                        ctx.beginPath(); ctx.moveTo(5, 4.5); ctx.lineTo(5, 11); ctx.quadraticCurveTo(5, 16, 0, 16); ctx.stroke();
+                        if (biting) {
+                            const ring = Math.sin(ts / 80) * 0.5 + 0.5;
+                            ctx.strokeStyle = `rgba(239,68,68,${ring})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 18 + ring * 10, 0, Math.PI * 2); ctx.stroke();
+                            ctx.strokeStyle = `rgba(239,68,68,${ring * 0.4})`; ctx.beginPath(); ctx.arc(0, 0, 30 + ring * 10, 0, Math.PI * 2); ctx.stroke();
+                        }
+                        ctx.restore();
+                    });
+                    ctx.save(); ctx.beginPath(); ctx.arc(w * 0.5, h * 0.16, 5, 0, Math.PI * 2); ctx.fillStyle = 'rgba(200,180,140,0.75)'; ctx.fill(); ctx.restore();
+                }
+
+                this.particles.forEach(p => {
+                    ctx.save(); ctx.globalAlpha = Math.max(0, p.life); ctx.fillStyle = p.color || '#7dd3fc';
+                    ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+                });
+
+                if ((this.state.upgrades.sonar || 0) > 0 && this.fishingState === 'WAITING' && this.hooks[0]) {
+                    const pingR = ((ts % 2000) / 2000) * 85;
+                    ctx.save(); ctx.strokeStyle = `rgba(0,176,240,${(1 - pingR / 85) * 0.28})`; ctx.lineWidth = 1.5;
+                    ctx.beginPath(); ctx.arc(this.hooks[0].x, this.hooks[0].y, pingR, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+                }
+
+                if (this.fishingState === 'IDLE') {
+                    const pulse = 0.5 + Math.sin(ts / 550) * 0.28;
+                    ctx.save(); ctx.globalAlpha = pulse; ctx.fillStyle = '#fff'; ctx.font = 'bold 16px Segoe UI';
+                    ctx.textAlign = 'center'; ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(0,176,240,0.75)';
+                    ctx.fillText('TAP TO CAST', w / 2, waterY + 44); ctx.restore();
+                }
+
+                if (this.combo >= 2) {
+                    ctx.save(); ctx.globalAlpha = 0.82; ctx.fillStyle = '#facc15'; ctx.font = 'bold 13px Segoe UI';
+                    ctx.textAlign = 'right'; ctx.fillText('🔥 ' + this.combo + 'x COMBO', w - 12, h - 102); ctx.restore();
+                }
+            }
+
+            drawFishEntity(ctx, x, y, size, fishData, life = 1) {
+                ctx.save(); ctx.translate(x, y);
+                const rarity = fishData.template ? fishData.template.rarity : fishData.fishRarity;
+                let color = CONFIG.rarities[rarity].color;
+                const muts = fishData.mutations || [];
+                const isGolden = muts.some(m => m.name === 'Golden' || m.name === 'Sunforged');
+                const isGhostly = muts.some(m => ['Ghostly', 'Phantom', 'Spectral', 'Ethereal'].includes(m.name));
+                const isPlump = muts.some(m => ['Plump', 'Pudgy', 'Heavy'].includes(m.name));
+                const isLong = muts.some(m => ['Long', 'Sleek'].includes(m.name));
+                const isSpiky = muts.some(m => ['Spiky', 'Savage', 'Vicious'].includes(m.name));
+                const isCrystalline = muts.some(m => ['Crystalline', 'Diamond'].includes(m.name));
+                const isElectric = muts.some(m => ['Electric', 'Neon', 'Radioactive'].includes(m.name));
+                const isGiant = muts.some(m => m.name === 'Giant');
+                const isInfernal = muts.some(m => ['Infernal', 'Charred', 'Bloodsoaked'].includes(m.name));
+                const isCelestial = muts.some(m => ['Celestial', 'Astral', 'Starborn'].includes(m.name));
+                if (isGolden) color = '#fbbf24';
+                if (isCrystalline) color = '#a5f3fc';
+                if (isInfernal) color = '#ef4444';
+                if (isCelestial) color = '#e0e7ff';
+                let hmc = null, hmi = -1;
+                muts.forEach(m => { const d = MUTATION_CLASSES[m.class]; if (d && d.id > hmi) { hmi = d.id; hmc = d.color; } });
+                if (hmc) { ctx.shadowBlur = 22; ctx.shadowColor = hmc; }
+                if (isElectric) { ctx.shadowBlur = 26; ctx.shadowColor = '#a78bfa'; }
+                if (isCelestial) { ctx.shadowBlur = 30; ctx.shadowColor = '#818cf8'; }
+                ctx.globalAlpha = isGhostly ? 0.36 * Math.max(0, life) : Math.max(0, life);
+                let bw = size * (isGiant ? 1.55 : 1), bh = size * 0.58;
+                if (isPlump) bh *= 1.5; if (isLong) bw *= 1.55;
+                ctx.fillStyle = color;
+                ctx.beginPath(); ctx.moveTo(-bw * 0.44, 0); ctx.lineTo(-bw * 1.6, -bh * 0.9); ctx.lineTo(-bw * 1.6, bh * 0.9); ctx.fill();
+                if (isSpiky) {
+                    ctx.fillStyle = hmc || color;
+                    for (let i = -bw * 0.5; i < bw * 0.5; i += bw * 0.35) {
+                        ctx.beginPath(); ctx.moveTo(i, -bh * 0.5); ctx.lineTo(i + bw * 0.17, -bh * 1.65); ctx.lineTo(i + bw * 0.34, -bh * 0.5); ctx.fill();
+                    }
+                }
+                if (isCrystalline) {
+                    ctx.fillStyle = color; ctx.globalAlpha *= 0.75;
+                    ctx.beginPath(); ctx.moveTo(-bw, 0); ctx.lineTo(-bw * 0.3, -bh); ctx.lineTo(bw, 0); ctx.lineTo(-bw * 0.3, bh); ctx.closePath(); ctx.fill();
+                    ctx.fillStyle = 'rgba(255,255,255,0.28)'; ctx.beginPath(); ctx.moveTo(-bw * 0.3, -bh); ctx.lineTo(bw, 0); ctx.lineTo(-bw * 0.1, 0); ctx.closePath(); ctx.fill();
+                } else {
+                    ctx.fillStyle = color; ctx.beginPath(); ctx.ellipse(0, 0, bw, bh, 0, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = 'rgba(255,255,255,0.16)'; ctx.beginPath(); ctx.ellipse(bw * 0.1, bh * 0.22, bw * 0.5, bh * 0.38, 0, 0, Math.PI * 2); ctx.fill();
+                }
+                ctx.fillStyle = hmc ? hmc + '99' : color + '99';
+                ctx.beginPath(); ctx.moveTo(0, -bh * 0.95); ctx.lineTo(bw * 0.28, -bh * 1.65); ctx.lineTo(bw * 0.56, -bh * 0.95); ctx.fill();
+                if (isElectric) {
+                    ctx.strokeStyle = 'rgba(196,181,253,0.7)'; ctx.lineWidth = 1.5;
+                    for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.moveTo(-bw * 0.5 + i * bw * 0.38, -bh * 0.5); ctx.lineTo(-bw * 0.3 + i * bw * 0.38 + 9, 0); ctx.lineTo(-bw * 0.1 + i * bw * 0.38, bh * 0.5); ctx.stroke(); }
+                }
+                if (isCelestial) {
+                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                    for (let i = 0; i < 4; i++) { const ang = i * Math.PI / 2; ctx.beginPath(); ctx.arc(Math.cos(ang) * bw * 0.5, Math.sin(ang) * bh * 0.5, 2, 0, Math.PI * 2); ctx.fill(); }
+                }
+                ctx.shadowBlur = 0; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(bw * 0.42, -bh * 0.22, size * 0.14, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#0a0a0a'; ctx.beginPath(); ctx.arc(bw * 0.46, -bh * 0.22, size * 0.08, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        const game = new Game();
+    </script>
 </body>
+
 </html>
