@@ -1000,6 +1000,280 @@
                 grid-template-columns: repeat(3, 1fr);
             }
         }
+
+        /* Mutation tag styles */
+        .mut-tag {
+            display: inline-block;
+            padding: 3px 7px;
+            border-radius: 5px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            margin: 2px 3px 2px 0;
+            color: #000;
+            text-shadow: none;
+            letter-spacing: 0.3px;
+        }
+
+        /* Different background opacities for mutation tags based on class */
+        .mut-tag[data-class="Common"] {
+            background: #94a3b8;
+            color: #1a1a2e;
+        }
+
+        .mut-tag[data-class="Uncommon"] {
+            background: #4ade80;
+            color: #0a2a1a;
+        }
+
+        .mut-tag[data-class="Rare"] {
+            background: #60a5fa;
+            color: #0a1a3a;
+        }
+
+        .mut-tag[data-class="UltraRare"] {
+            background: #f43f5e;
+            color: #1a0a0a;
+        }
+
+        .mut-tag[data-class="Legendary"] {
+            background: #fbbf24;
+            color: #2a1a00;
+        }
+
+        .mut-tag[data-class="Mythical"] {
+            background: #c084fc;
+            color: #1a0a2a;
+        }
+
+        .mut-tag[data-class="Divine"] {
+            background: #facc15;
+            color: #1a1a00;
+            text-shadow: 0 0 4px rgba(255, 255, 0, 0.5);
+        }
+
+        .mut-tag[data-class="Secret"] {
+            background: #ffffff;
+            color: #000000;
+            box-shadow: 0 0 6px #fff;
+        }
+
+        /* Upgrade item hover effects for grid */
+        .upgrade-item {
+            transition: transform 0.15s ease, border-color 0.15s ease;
+        }
+
+        .upgrade-item:active {
+            transform: scale(0.98);
+        }
+
+        /* Encyclopedia card image container */
+        .enc-card img {
+            display: block;
+            margin: 7px auto;
+            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6));
+            max-width: 100%;
+            height: auto;
+            image-rendering: crisp-edges;
+        }
+
+        /* Toast container positioning fix */
+        #toast-container {
+            z-index: 150;
+            pointer-events: none;
+            bottom: 95px;
+        }
+
+        /* Save slot styles */
+        .slot-card {
+            transition: transform 0.15s ease, border-color 0.15s ease;
+        }
+
+        .slot-card:active {
+            transform: scale(0.98);
+        }
+
+        .slot-name {
+            font-size: 1rem;
+            font-weight: 800;
+            word-break: break-word;
+        }
+
+        .slot-stats {
+            font-size: 0.7rem;
+            color: #888;
+            margin: 8px 0;
+        }
+
+        .slot-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .slot-actions button {
+            flex: 1;
+            padding: 8px 6px;
+            font-size: 0.7rem;
+            min-height: 36px;
+            text-align: center;
+            margin: 0;
+        }
+
+        /* Update notification styles */
+        #update-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(8, 10, 14, 0.98);
+            backdrop-filter: blur(24px);
+            border: 2px solid var(--accent);
+            border-radius: 24px;
+            padding: 24px 20px;
+            z-index: 600;
+            text-align: center;
+            max-width: 90%;
+            width: 340px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        #update-notification h3 {
+            color: var(--accent);
+            font-size: 1.2rem;
+            margin: 0;
+        }
+
+        #update-notification p {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #ccc;
+            margin: 0;
+        }
+
+        #update-notification button {
+            margin: 0;
+            text-align: center;
+            padding: 12px;
+        }
+
+        /* Level badge animation */
+        #level-badge {
+            transition: all 0.2s ease;
+        }
+
+        #level-badge:active {
+            transform: scale(0.95);
+        }
+
+        /* Weather banner special effects */
+        #weather-banner[data-special="bloodmoon"] {
+            color: #ef4444;
+            text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+            animation: pulseRed 2s infinite;
+        }
+
+        #weather-banner[data-special="eclipse"] {
+            color: #818cf8;
+            text-shadow: 0 0 8px rgba(129, 140, 248, 0.5);
+        }
+
+        @keyframes pulseRed {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+                text-shadow: 0 0 12px #ef4444;
+            }
+        }
+
+        /* Cursor stabilizer indicator */
+        #stabilizer-indicator {
+            position: fixed;
+            bottom: 80px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 0.65rem;
+            font-family: monospace;
+            color: #60a5fa;
+            z-index: 45;
+            pointer-events: none;
+            backdrop-filter: blur(4px);
+        }
+
+        /* Combo counter enhancement */
+        .combo-popup {
+            white-space: nowrap;
+            font-weight: 900;
+            font-size: 1.8rem;
+        }
+
+        /* Scrollbar for panels */
+        .panel-body::-webkit-scrollbar,
+        #enc-grid::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .panel-body::-webkit-scrollbar-track,
+        #enc-grid::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        .panel-body::-webkit-scrollbar-thumb,
+        #enc-grid::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        /* Fish chip styles in reeling UI */
+        .fish-chip {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1.5px solid #444;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            transition: all 0.1s ease;
+        }
+
+        /* Responsive adjustments for very small screens */
+        @media (max-width: 480px) {
+            .fish-chip {
+                font-size: 0.6rem;
+                padding: 3px 8px;
+            }
+
+            .mut-tag {
+                font-size: 0.55rem;
+                padding: 2px 5px;
+            }
+
+            .enc-title {
+                font-size: 0.85rem;
+            }
+
+            #update-notification {
+                width: 90%;
+                padding: 18px 16px;
+            }
+
+            #update-notification h3 {
+                font-size: 1rem;
+            }
+
+            #update-notification p {
+                font-size: 0.75rem;
+            }
+        }
     </style>
 </head>
 
@@ -1015,7 +1289,8 @@
                 <div class="area-name" id="current-area-name">🏞️ Peaceful Lake</div>
             </div>
             <div id="money-pill"><i class="fa-solid fa-coins"></i> <span id="money-display">0</span></div>
-            <button class="btn-dex" onclick="game.toggleEncyclopedia()"><i class="fa-solid fa-book-open"></i> Dex</button>
+            <button class="btn-dex" onclick="game.toggleEncyclopedia()"><i class="fa-solid fa-book-open"></i>
+                Dex</button>
         </div>
         <div id="xp-bar-wrap">
             <div id="xp-bar-fill" style="width:0%"></div>
@@ -1039,7 +1314,8 @@
                 </div>
                 <div id="timing-cursor"></div>
             </div>
-            <p>Tap <span style="color:#4ade80;font-weight:800">GREEN</span> or <span style="color:#facc15;font-weight:800">GOLD</span> to reel!</p>
+            <p>Tap <span style="color:#4ade80;font-weight:800">GREEN</span> or <span
+                    style="color:#facc15;font-weight:800">GOLD</span> to reel!</p>
         </div>
         <div id="profile-panel" class="tab-panel">
             <div class="panel-header">
@@ -1047,19 +1323,32 @@
             </div>
             <div class="panel-body">
                 <div class="upgrade-item" style="margin-bottom:14px">
-                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-star"></i> Level</span><span class="stat-val" id="level-display">1</span></div>
-                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-fish"></i> Total Caught</span><span class="stat-val" id="total-caught-display">0</span></div>
-                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-money-bill-wave"></i> Total Earned</span><span class="stat-val" id="total-earned-display">$0</span></div>
-                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-fire"></i> Best Combo</span><span class="stat-val" id="best-combo-display">0x</span></div>
-                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-ruler-horizontal"></i> Rod</span><span style="font-weight:800;color:#fff" id="stat-rod">Bamboo</span></div>
-                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-anchor"></i> Hooks</span><span class="stat-val" id="stat-hooks">1</span></div>
-                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-clover"></i> Luck Bonus</span><span class="stat-val" id="stat-luck">0%</span></div>
-                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-robot"></i> Auto Fisher</span><span class="stat-val" id="stat-auto">Off</span></div>
-                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-cloud-sun-rain"></i> Weather</span><span class="stat-val" id="weather-display">Clear</span></div>
-                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-bolt"></i> Effect</span><span style="font-size:0.75rem;color:#aaa;text-align:right;max-width:55%" id="weather-effect-display">—</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-star"></i> Level</span><span
+                            class="stat-val" id="level-display">1</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-fish"></i> Total
+                            Caught</span><span class="stat-val" id="total-caught-display">0</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-money-bill-wave"></i> Total
+                            Earned</span><span class="stat-val" id="total-earned-display">$0</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-fire"></i> Best
+                            Combo</span><span class="stat-val" id="best-combo-display">0x</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-ruler-horizontal"></i>
+                            Rod</span><span style="font-weight:800;color:#fff" id="stat-rod">Bamboo</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-anchor"></i> Hooks</span><span
+                            class="stat-val" id="stat-hooks">1</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-clover"></i> Luck
+                            Bonus</span><span class="stat-val" id="stat-luck">0%</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-robot"></i> Auto
+                            Fisher</span><span class="stat-val" id="stat-auto">Off</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-cloud-sun-rain"></i>
+                            Weather</span><span class="stat-val" id="weather-display">Clear</span></div>
+                    <div class="stat-row"><span class="stat-label"><i class="fa-solid fa-bolt"></i> Effect</span><span
+                            style="font-size:0.75rem;color:#aaa;text-align:right;max-width:55%"
+                            id="weather-effect-display">—</span></div>
                 </div>
-                <button class="btn-reset" onclick="game.showSaveSlots()"><i class="fa-solid fa-floppy-disk"></i> &nbsp;Save Slots</button>
-                <button class="btn-reset" style="margin-top:8px;border-color:#facc15;color:#facc15" onclick="game.resetGame()"><i class="fa-solid fa-rotate-left"></i> &nbsp;Reset Current Save</button>
+                <button class="btn-reset" onclick="game.showSaveSlots()"><i class="fa-solid fa-floppy-disk"></i>
+                    &nbsp;Save Slots</button>
+                <button class="btn-reset" style="margin-top:8px;border-color:#facc15;color:#facc15"
+                    onclick="game.resetGame()"><i class="fa-solid fa-rotate-left"></i> &nbsp;Reset Current Save</button>
             </div>
         </div>
         <div id="upgrades-panel" class="tab-panel">
@@ -1068,7 +1357,8 @@
             </div>
             <div class="panel-body">
                 <div class="sub-tab-bar">
-                    <button class="sub-tab-btn active" data-sub="rods"><i class="fa-solid fa-ruler-horizontal"></i> Rods</button>
+                    <button class="sub-tab-btn active" data-sub="rods"><i class="fa-solid fa-ruler-horizontal"></i>
+                        Rods</button>
                     <button class="sub-tab-btn" data-sub="skills"><i class="fa-solid fa-chart-line"></i> Skills</button>
                     <button class="sub-tab-btn" data-sub="bait"><i class="fa-solid fa-worm"></i> Bait</button>
                     <button class="sub-tab-btn" data-sub="travel"><i class="fa-solid fa-water"></i> Areas</button>
@@ -1094,7 +1384,8 @@
                     <button class="enc-sort-btn active" id="sort-mut" onclick="game.sortEnc('mutation')">Mut</button>
                     <button class="enc-sort-btn" id="sort-rare" onclick="game.sortEnc('rarity')">Rarity</button>
                     <button class="enc-sort-btn" id="sort-val" onclick="game.sortEnc('value')">Value</button>
-                    <button class="enc-close" onclick="game.toggleEncyclopedia()"><i class="fa-solid fa-xmark"></i></button>
+                    <button class="enc-close" onclick="game.toggleEncyclopedia()"><i
+                            class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
             <div id="enc-grid"></div>
@@ -1115,7 +1406,8 @@
         <div class="screen-flash" id="flash-overlay"></div>
         <div id="bottom-nav">
             <button class="nav-item" data-tab="profile"><i class="fa-solid fa-id-card"></i><span>Profile</span></button>
-            <button class="nav-item active" data-tab="game"><i class="fa-solid fa-fish-fins"></i><span>Fish</span></button>
+            <button class="nav-item active" data-tab="game"><i
+                    class="fa-solid fa-fish-fins"></i><span>Fish</span></button>
             <button class="nav-item" data-tab="upgrades"><i class="fa-solid fa-store"></i><span>Shop</span></button>
         </div>
     </div>
@@ -1334,7 +1626,7 @@
                 window.addEventListener('keydown', (e) => { if (e.code === 'Space' && !this.encOpen) { e.preventDefault(); if (!e.repeat) this.handleAction(); } });
                 this.canvas.addEventListener('pointerdown', () => { if (!this.encOpen) this.handleAction(); });
                 document.getElementById('tap-zone').addEventListener('pointerdown', (e) => { e.stopPropagation(); if (!this.encOpen) this.handleAction(); });
-                
+
                 document.querySelectorAll('.nav-item').forEach(btn => {
                     btn.addEventListener('click', () => {
                         document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
@@ -1345,7 +1637,7 @@
                         if (tab === 'upgrades') document.getElementById('upgrades-panel').classList.add('active');
                     });
                 });
-                
+
                 document.querySelectorAll('.sub-tab-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
                         document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
@@ -1354,7 +1646,7 @@
                         document.getElementById('sub-' + btn.dataset.sub).classList.add('active');
                     });
                 });
-                
+
                 this.renderShop(); this.updateUI();
                 this.scheduleWeather();
                 setInterval(() => this.save(), 8000);
@@ -1364,7 +1656,7 @@
             checkForUpdateNotification() {
                 const hasSeenUpdate = localStorage.getItem('zenFisherSeenUpdate');
                 const oldSaveExists = localStorage.getItem('zenFisher3');
-                
+
                 if (oldSaveExists && !hasSeenUpdate) {
                     setTimeout(() => {
                         document.getElementById('update-notification').style.display = 'flex';
@@ -1389,7 +1681,7 @@
                         this.log("Loaded your previous save! Some balance changes applied.", "#facc15");
                         this.updateUI();
                         this.renderShop();
-                    } catch(e) {}
+                    } catch (e) { }
                 }
             }
 
@@ -1403,9 +1695,9 @@
                 const container = document.getElementById('save-slots-list');
                 const slots = SaveSlotManager.getAllSlotNames();
                 const currentSlot = SaveSlotManager.getCurrentSlot();
-                
+
                 let html = '';
-                
+
                 // New slot button
                 html += `<div class="slot-card">
                     <div class="slot-name">➕ New Save</div>
@@ -1414,7 +1706,7 @@
                         <button class="btn-buy" onclick="game.createNewSlot()">Create New</button>
                     </div>
                 </div>`;
-                
+
                 // Existing slots
                 slots.forEach(slot => {
                     const isCurrent = slot === currentSlot;
@@ -1427,7 +1719,7 @@
                         </div>
                     </div>`;
                 });
-                
+
                 container.innerHTML = html;
             }
 
@@ -1589,24 +1881,24 @@
                     const c = CONFIG.rarities[f.template.rarity].color;
                     return `<div class="fish-chip" style="border-color:${c};color:${c}">${f.template.name}</div>`;
                 }).join('');
-                
+
                 const diff = Math.max(...this.activeFishes.map(f => f ? f.diffMult : 1)) + ((hookCount - 1) * 1.5);
                 const ll = this.state.upgrades.line;
                 const stabilizer = this.state.upgrades.stabilizer || 0;
-                
+
                 this.miniGame.maxProgress = 100 + (diff * 18);
                 this.miniGame.progress = this.miniGame.maxProgress * 0.22;
                 this.miniGame.drainRate = Math.max(1.2, (diff * 5) - (ll * 0.6));
-                this.miniGame.freezeTimer = 0; 
+                this.miniGame.freezeTimer = 0;
                 this.miniGame.zenTimer = 2.2;
-                
+
                 this.miniGame.targetWidth = Math.min(82, Math.max(5, 32 - (diff * 2.8) + (ll * 5)));
                 this.miniGame.targetStart = 8 + Math.random() * (82 - this.miniGame.targetWidth);
                 this.miniGame.perfectWidth = Math.max(2, this.miniGame.targetWidth * 0.28);
                 this.miniGame.perfectStart = this.miniGame.targetStart + (this.miniGame.targetWidth / 2) - (this.miniGame.perfectWidth / 2);
-                this.miniGame.cursor = 0; 
+                this.miniGame.cursor = 0;
                 this.miniGame.dir = 1;
-                
+
                 let baseSpeed = 2.0 + (diff * 0.7);
                 let sizeFactor = Math.max(0.6, Math.min(1.4, 25 / this.miniGame.targetWidth));
                 let finalSpeed = baseSpeed * sizeFactor;
@@ -1614,7 +1906,7 @@
                 finalSpeed = finalSpeed * (1 - stabilizerReduction);
                 finalSpeed = finalSpeed - (ll * 0.08);
                 this.miniGame.speed = Math.min(8.0, Math.max(0.4, finalSpeed));
-                
+
                 this._updateTimingUI();
             }
 
@@ -1628,12 +1920,12 @@
             checkMiniGame() {
                 const pos = this.miniGame.cursor, ll = this.state.upgrades.line, g = 2.5;
                 const inGood = pos >= (this.miniGame.targetStart - g) && pos <= (this.miniGame.targetStart + this.miniGame.targetWidth + g);
-                const inPerf = pos >= (this.miniGame.perfectStart - g/2) && pos <= (this.miniGame.perfectStart + this.miniGame.perfectWidth + g/2);
-                const cx = this.canvas.width/2 + (Math.random()*50-25), cy = this.canvas.height/2-70;
-                
+                const inPerf = pos >= (this.miniGame.perfectStart - g / 2) && pos <= (this.miniGame.perfectStart + this.miniGame.perfectWidth + g / 2);
+                const cx = this.canvas.width / 2 + (Math.random() * 50 - 25), cy = this.canvas.height / 2 - 70;
+
                 const stabilizer = this.state.upgrades.stabilizer || 0;
                 const difficultyBonus = Math.max(1, this.miniGame.speed / 2);
-                
+
                 if (inPerf) {
                     let bonus = 38 + (ll * 6);
                     bonus += stabilizer * 3 * difficultyBonus;
@@ -1652,11 +1944,11 @@
                     this.flashScreen('rgba(239,68,68,0.3)');
                     this.createNotif("Miss!", cx, cy, "#ef4444");
                 }
-                
+
                 this.miniGame.targetStart = 8 + Math.random() * (82 - this.miniGame.targetWidth);
-                this.miniGame.perfectStart = this.miniGame.targetStart + (this.miniGame.targetWidth/2) - (this.miniGame.perfectWidth/2);
+                this.miniGame.perfectStart = this.miniGame.targetStart + (this.miniGame.targetWidth / 2) - (this.miniGame.perfectWidth / 2);
                 this._updateTimingUI();
-                
+
                 if (this.miniGame.progress >= this.miniGame.maxProgress) this.catchFish();
                 else if (this.miniGame.progress <= 0) this.escapeFish();
             }
@@ -1732,8 +2024,7 @@
                 let hc = CONFIG.rarities[fish.template.rarity].color;
                 fish.mutations.forEach(m => { if (MUTATION_CLASSES[m.class].id > 3) hc = MUTATION_CLASSES[m.class].color; });
                 n.style.borderLeftColor = hc;
-                let mh = fish.mutations.slice(0, 3).map(m => `<span class="mut-tag" style="background:${MUTATION_CLASSES[m.class].color}">${m.name}</span>`).join('');
-                n.innerHTML = `<div class="fn-name" style="color:${hc}">${fish.template.name}</div>${mh ? `<div class="fn-muts">${mh}</div>` : ''}<div class="fn-wt">⚖️ ${fish.weight}kg</div><div class="fn-val">💵 +$${finalValue.toLocaleString()}</div>`;
+                let mh = fish.mutations.slice(0, 3).map(m => `<span class="mut-tag" data-class="${MUTATION_CLASSES[m.class].class}" style="background:${MUTATION_CLASSES[m.class].color}">${m.name}</span>`).join(''); n.innerHTML = `<div class="fn-name" style="color:${hc}">${fish.template.name}</div>${mh ? `<div class="fn-muts">${mh}</div>` : ''}<div class="fn-wt">⚖️ ${fish.weight}kg</div><div class="fn-val">💵 +$${finalValue.toLocaleString()}</div>`;
                 c.appendChild(n); setTimeout(() => { if (n.parentNode) n.remove(); }, 5100);
             }
 
@@ -1779,8 +2070,7 @@
                     grid.innerHTML += `<div class="enc-card" style="border-color:${bc};box-shadow:0 4px 14px ${bc}22">
                         <div class="enc-title" style="color:${bc}">${item.name}</div>
                         <img src="${tc.toDataURL()}" style="display:block;margin:7px auto;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.6));max-width:100%;height:auto;">
-                        <div>${item.mutations.map(m => `<span class="mut-tag" style="background:${MUTATION_CLASSES[m.class].color}">${m.name}</span>`).join('')}</div>
-                        <div style="font-size:0.75rem;color:#888;margin-top:6px">⚖️ ${item.maxWeight}kg &nbsp;·&nbsp; 📍 ${item.areaCaught}</div>
+<div>${item.mutations.map(m => `<span class="mut-tag" data-class="${MUTATION_CLASSES[m.class].class}" style="background:${MUTATION_CLASSES[m.class].color}">${m.name}</span>`).join('')}</div>                        <div style="font-size:0.75rem;color:#888;margin-top:6px">⚖️ ${item.maxWeight}kg &nbsp;·&nbsp; 📍 ${item.areaCaught}</div>
                         <div style="font-size:0.75rem;color:#888">💵 <span style="color:#facc15">$${item.maxValue.toLocaleString()}</span> &nbsp;·&nbsp; ×${item.count}</div>
                     </div>`;
                 });
@@ -1824,14 +2114,14 @@
                     const af = this.state.money >= rod.cost || rod.cost === 0;
                     const requiredLevel = Math.floor(i * 3) + 1;
                     const canAfford = this.state.level >= requiredLevel && (af || owned);
-                    
+
                     const displayName = owned ? rod.name : `??? (Level ${requiredLevel})`;
                     const displayDesc = owned ? rod.desc : "???";
                     const displayHooks = owned ? rod.hooks : "?";
                     const displayWeight = owned ? (rod.maxWeight >= 1000 ? (rod.maxWeight / 1000).toFixed(0) + 't' : rod.maxWeight + 'kg') : "???";
                     const displayLinger = owned ? (rod.linger / 1000).toFixed(1) + 's' : "???";
                     const displayLuck = owned ? `+${rod.luckBonus}%` : "???";
-                    
+
                     rh += `<div class="upgrade-item" style="opacity: ${owned ? 1 : 0.7}">
                         <div class="item-header" style="color:${eqd ? '#00b0f0' : (owned ? '#fff' : '#888')}">
                             ${displayName}${eqd ? ' <span style="font-size:0.64rem;color:#00b0f0">[EQUIPPED]</span>' : ''}
@@ -1902,7 +2192,7 @@
                     const ia = this.state.currentArea === i;
                     const displayName = ul ? `${area.emoji} ${area.name}` : `${area.emoji} ???`;
                     const displayMult = ul ? `×${area.fishMult}` : "???";
-                    
+
                     if (ul) {
                         ah += `<div class="upgrade-item">
                             <div class="item-header" style="color:${ia ? '#4ade80' : '#fff'}">${displayName}</div>
@@ -1924,88 +2214,88 @@
                 document.getElementById('areas-list').innerHTML = ah;
             }
 
-            buyRod(i, cost) { 
+            buyRod(i, cost) {
                 const rod = CONFIG.rods[i];
                 const requiredLevel = Math.floor(i * 3) + 1;
-                
+
                 if (this.state.level < requiredLevel) {
                     this.log(`Need level ${requiredLevel} to buy ${rod.name}!`, "#f87171");
                     return;
                 }
-                
-                if (this.state.money >= cost && !this.state.ownedRods.includes(i)) { 
-                    this.state.money -= cost; 
-                    this.state.ownedRods.push(i); 
-                    this.state.equippedRod = i; 
-                    this.updateUI(); 
-                    this.renderShop(); 
-                    this.log('Bought ' + CONFIG.rods[i].name + '!', '#4ade80'); 
-                } 
+
+                if (this.state.money >= cost && !this.state.ownedRods.includes(i)) {
+                    this.state.money -= cost;
+                    this.state.ownedRods.push(i);
+                    this.state.equippedRod = i;
+                    this.updateUI();
+                    this.renderShop();
+                    this.log('Bought ' + CONFIG.rods[i].name + '!', '#4ade80');
+                }
             }
-            
-            equipRod(i) { 
+
+            equipRod(i) {
                 const rod = CONFIG.rods[i];
                 const requiredLevel = Math.floor(i * 3) + 1;
-                
+
                 if (this.state.level < requiredLevel) {
                     this.log(`Cannot equip ${rod.name} - Need level ${requiredLevel}!`, "#f87171");
                     return;
                 }
-                
-                if (this.state.ownedRods.includes(i)) { 
-                    this.state.equippedRod = i; 
-                    this.updateUI(); 
-                    this.renderShop(); 
+
+                if (this.state.ownedRods.includes(i)) {
+                    this.state.equippedRod = i;
+                    this.updateUI();
+                    this.renderShop();
                     this.log(`Equipped ${rod.name}!`, '#4ade80');
-                } 
+                }
             }
-            
-            buyUpgrade(id, cost) { 
-                if (this.state.money >= cost) { 
-                    this.state.money -= cost; 
-                    if (!this.state.upgrades[id]) this.state.upgrades[id] = 0; 
-                    this.state.upgrades[id]++; 
-                    this.updateUI(); 
-                    this.renderShop(); 
-                    this.log('Upgraded!', '#4ade80'); 
-                } 
+
+            buyUpgrade(id, cost) {
+                if (this.state.money >= cost) {
+                    this.state.money -= cost;
+                    if (!this.state.upgrades[id]) this.state.upgrades[id] = 0;
+                    this.state.upgrades[id]++;
+                    this.updateUI();
+                    this.renderShop();
+                    this.log('Upgraded!', '#4ade80');
+                }
             }
-            
-            buyBait(name) { 
-                const b = BAITS[name]; 
-                if (this.state.money >= b.cost) { 
-                    this.state.money -= b.cost; 
-                    this.state.activeBait = name; 
-                    this.state.baitUses = b.maxUses; 
-                    this.updateUI(); 
-                    this.renderShop(); 
-                } 
+
+            buyBait(name) {
+                const b = BAITS[name];
+                if (this.state.money >= b.cost) {
+                    this.state.money -= b.cost;
+                    this.state.activeBait = name;
+                    this.state.baitUses = b.maxUses;
+                    this.updateUI();
+                    this.renderShop();
+                }
             }
-            
-            travelTo(i) { 
+
+            travelTo(i) {
                 const area = CONFIG.areas[i];
                 if (this.state.level < area.minLevel) {
                     this.log(`Need level ${area.minLevel} to travel to ${area.name}!`, "#f87171");
                     return;
                 }
-                this.state.currentArea = i; 
-                this.updateUI(); 
-                this.renderShop(); 
+                this.state.currentArea = i;
+                this.updateUI();
+                this.renderShop();
             }
-            
-            unlockArea(i, cost) { 
+
+            unlockArea(i, cost) {
                 const area = CONFIG.areas[i];
                 if (this.state.level < area.minLevel) {
                     this.log(`Need level ${area.minLevel} to unlock ${area.name}!`, "#f87171");
                     return;
                 }
-                if (this.state.money >= cost) { 
-                    this.state.money -= cost; 
-                    this.state.unlockedAreas.push(i); 
-                    this.state.currentArea = i; 
-                    this.updateUI(); 
-                    this.renderShop(); 
-                } 
+                if (this.state.money >= cost) {
+                    this.state.money -= cost;
+                    this.state.unlockedAreas.push(i);
+                    this.state.currentArea = i;
+                    this.updateUI();
+                    this.renderShop();
+                }
             }
 
             log(msg, color = '#94a3b8') {
@@ -2026,7 +2316,7 @@
 
             flashScreen(color) { const f = document.getElementById('flash-overlay'); f.style.background = color; f.style.opacity = '1'; setTimeout(() => f.style.opacity = '0', 90); }
 
-            save() { 
+            save() {
                 if (this.currentSlot) {
                     SaveSlotManager.saveSlot(this.currentSlot, this.state);
                 } else {
@@ -2035,7 +2325,7 @@
                     this.currentSlot = defaultSlot;
                 }
             }
-            
+
             load() {
                 const currentSlot = SaveSlotManager.getCurrentSlot();
                 if (currentSlot) {
@@ -2052,19 +2342,19 @@
                     }
                 }
             }
-            
-            resetGame() { 
-                if (confirm("Reset current save? This cannot be undone!")) { 
+
+            resetGame() {
+                if (confirm("Reset current save? This cannot be undone!")) {
                     if (this.currentSlot) {
                         SaveSlotManager.deleteSlot(this.currentSlot);
                     }
                     this.state = this.getDefaultState();
                     this.currentSlot = null;
-                    this.updateUI(); 
+                    this.updateUI();
                     this.renderShop();
                     this.log("Save reset! Create a new save to continue.", "#facc15");
                     this.showSaveSlots();
-                } 
+                }
             }
 
             // Drawing methods (simplified for length - same as original)
