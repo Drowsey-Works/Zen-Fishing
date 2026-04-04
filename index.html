@@ -2140,8 +2140,13 @@
             show() {
                 document.getElementById('menu-overlay').classList.add('active');
                 this.canvas.style.display = 'block';
-                this.resize();  // Add this line!
+                this.resize();
                 this.updateButtons();
+
+                // Make sure gameCore is set when menu shows the game
+                if (this.game) {
+                    window.gameCore = this.game;
+                }
             }
 
             hide() {
@@ -2279,6 +2284,7 @@
 
             show() {
                 this.game.start();
+                window.gameCore = this.game;
             }
 
             hide() {
@@ -2751,146 +2757,146 @@
                 this.updateUI();
             }
 
-        
 
 
 
-        showComboPopup(text, color) {
-            const el = document.createElement('div');
-            el.className = 'combo-popup';
-            el.style.color = color;
-            el.textContent = text;
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 1300);
-        }
 
-        showFishNotification(fish, finalValue) {
-            const c = document.getElementById('notification-container');
-            if (c.children.length >= 4) c.removeChild(c.firstChild);
-            const n = document.createElement('div');
-            n.className = 'fish-notif';
-            let hc = CONFIG.rarities[fish.template.rarity].color;
-            fish.mutations.forEach(m => {
-                if (MUTATION_CLASSES[m.class].id > 3) hc = MUTATION_CLASSES[m.class].color;
-            });
-            n.style.borderLeftColor = hc;
-            let mh = fish.mutations.slice(0, 3).map(m =>
-                `<span class="mut-tag" data-class="${MUTATION_CLASSES[m.class].class}" style="background:${MUTATION_CLASSES[m.class].color}">${m.name}</span>`
-            ).join('');
-            n.innerHTML = `<div class="fn-name" style="color:${hc}">${fish.template.name}</div>${mh ? `<div class="fn-muts">${mh}</div>` : ''}<div class="fn-wt">⚖️ ${fish.weight}kg</div><div class="fn-val">💵 +$${finalValue.toLocaleString()}</div>`;
-            c.appendChild(n);
-            setTimeout(() => { if (n.parentNode) n.remove(); }, 5100);
-        }
-
-        addToEncyclopedia(fd, fn, vc) {
-            const id = fd.template.name + '_' + fd.mutations.map(m => m.name).sort().join('_');
-            let ex = this.state.encyclopedia.find(e => e.id === id);
-            if (!ex) this.state.encyclopedia.push({
-                id, name: fn, baseFishName: fd.template.name,
-                fishRarity: fd.template.rarity, mutations: fd.mutations,
-                maxWeight: fd.weight, maxValue: vc,
-                areaCaught: CONFIG.areas[this.state.currentArea].name, count: 1
-            });
-            else {
-                ex.count++;
-                if (fd.weight > ex.maxWeight) ex.maxWeight = fd.weight;
-                if (vc > ex.maxValue) ex.maxValue = vc;
+            showComboPopup(text, color) {
+                const el = document.createElement('div');
+                el.className = 'combo-popup';
+                el.style.color = color;
+                el.textContent = text;
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 1300);
             }
-            if (this.encOpen) this.renderEncyclopedia();
-        }
 
-        toggleEncyclopedia() {
-            this.encOpen = !this.encOpen;
-            document.getElementById('encyclopedia-panel').style.display = this.encOpen ? 'flex' : 'none';
-            if (this.encOpen) this.renderEncyclopedia();
-        }
+            showFishNotification(fish, finalValue) {
+                const c = document.getElementById('notification-container');
+                if (c.children.length >= 4) c.removeChild(c.firstChild);
+                const n = document.createElement('div');
+                n.className = 'fish-notif';
+                let hc = CONFIG.rarities[fish.template.rarity].color;
+                fish.mutations.forEach(m => {
+                    if (MUTATION_CLASSES[m.class].id > 3) hc = MUTATION_CLASSES[m.class].color;
+                });
+                n.style.borderLeftColor = hc;
+                let mh = fish.mutations.slice(0, 3).map(m =>
+                    `<span class="mut-tag" data-class="${MUTATION_CLASSES[m.class].class}" style="background:${MUTATION_CLASSES[m.class].color}">${m.name}</span>`
+                ).join('');
+                n.innerHTML = `<div class="fn-name" style="color:${hc}">${fish.template.name}</div>${mh ? `<div class="fn-muts">${mh}</div>` : ''}<div class="fn-wt">⚖️ ${fish.weight}kg</div><div class="fn-val">💵 +$${finalValue.toLocaleString()}</div>`;
+                c.appendChild(n);
+                setTimeout(() => { if (n.parentNode) n.remove(); }, 5100);
+            }
 
-        sortEnc(mode) {
-            this.encSortMode = mode;
-            document.querySelectorAll('.enc-sort-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById({ mutation: 'sort-mut', rarity: 'sort-rare', value: 'sort-val' }[mode]).classList.add('active');
-            this.renderEncyclopedia();
-        }
-
-        renderEncyclopedia() {
-            const grid = document.getElementById('enc-grid');
-            grid.innerHTML = '';
-            let list = [...this.state.encyclopedia].sort((a, b) => {
-                if (this.encSortMode === 'mutation') {
-                    let am = a.mutations.length > 0 ? Math.max(...a.mutations.map(m => MUTATION_CLASSES[m.class].id)) : -1;
-                    let bm = b.mutations.length > 0 ? Math.max(...b.mutations.map(m => MUTATION_CLASSES[m.class].id)) : -1;
-                    return am !== bm ? bm - am : b.maxValue - a.maxValue;
-                } else if (this.encSortMode === 'rarity') {
-                    let ar = CONFIG.rarities[a.fishRarity].index, br = CONFIG.rarities[b.fishRarity].index;
-                    return ar !== br ? br - ar : b.maxValue - a.maxValue;
+            addToEncyclopedia(fd, fn, vc) {
+                const id = fd.template.name + '_' + fd.mutations.map(m => m.name).sort().join('_');
+                let ex = this.state.encyclopedia.find(e => e.id === id);
+                if (!ex) this.state.encyclopedia.push({
+                    id, name: fn, baseFishName: fd.template.name,
+                    fishRarity: fd.template.rarity, mutations: fd.mutations,
+                    maxWeight: fd.weight, maxValue: vc,
+                    areaCaught: CONFIG.areas[this.state.currentArea].name, count: 1
+                });
+                else {
+                    ex.count++;
+                    if (fd.weight > ex.maxWeight) ex.maxWeight = fd.weight;
+                    if (vc > ex.maxValue) ex.maxValue = vc;
                 }
-                return b.maxValue - a.maxValue;
-            });
-            list.forEach(item => {
-                let bc = CONFIG.rarities[item.fishRarity].color;
-                item.mutations.forEach(m => { if (MUTATION_CLASSES[m.class].id > 3) bc = MUTATION_CLASSES[m.class].color; });
-                const tc = document.createElement('canvas');
-                tc.width = 160;
-                tc.height = 90;
-                const tx = tc.getContext('2d');
-                this.drawFishEntity(tx, 80, 45, Math.min(32, 16 + Math.sqrt(item.maxWeight) * 2), item, 1);
-                grid.innerHTML += `<div class="enc-card" style="border-color:${bc};box-shadow:0 4px 14px ${bc}22">
+                if (this.encOpen) this.renderEncyclopedia();
+            }
+
+            toggleEncyclopedia() {
+                this.encOpen = !this.encOpen;
+                document.getElementById('encyclopedia-panel').style.display = this.encOpen ? 'flex' : 'none';
+                if (this.encOpen) this.renderEncyclopedia();
+            }
+
+            sortEnc(mode) {
+                this.encSortMode = mode;
+                document.querySelectorAll('.enc-sort-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById({ mutation: 'sort-mut', rarity: 'sort-rare', value: 'sort-val' }[mode]).classList.add('active');
+                this.renderEncyclopedia();
+            }
+
+            renderEncyclopedia() {
+                const grid = document.getElementById('enc-grid');
+                grid.innerHTML = '';
+                let list = [...this.state.encyclopedia].sort((a, b) => {
+                    if (this.encSortMode === 'mutation') {
+                        let am = a.mutations.length > 0 ? Math.max(...a.mutations.map(m => MUTATION_CLASSES[m.class].id)) : -1;
+                        let bm = b.mutations.length > 0 ? Math.max(...b.mutations.map(m => MUTATION_CLASSES[m.class].id)) : -1;
+                        return am !== bm ? bm - am : b.maxValue - a.maxValue;
+                    } else if (this.encSortMode === 'rarity') {
+                        let ar = CONFIG.rarities[a.fishRarity].index, br = CONFIG.rarities[b.fishRarity].index;
+                        return ar !== br ? br - ar : b.maxValue - a.maxValue;
+                    }
+                    return b.maxValue - a.maxValue;
+                });
+                list.forEach(item => {
+                    let bc = CONFIG.rarities[item.fishRarity].color;
+                    item.mutations.forEach(m => { if (MUTATION_CLASSES[m.class].id > 3) bc = MUTATION_CLASSES[m.class].color; });
+                    const tc = document.createElement('canvas');
+                    tc.width = 160;
+                    tc.height = 90;
+                    const tx = tc.getContext('2d');
+                    this.drawFishEntity(tx, 80, 45, Math.min(32, 16 + Math.sqrt(item.maxWeight) * 2), item, 1);
+                    grid.innerHTML += `<div class="enc-card" style="border-color:${bc};box-shadow:0 4px 14px ${bc}22">
                         <div class="enc-title" style="color:${bc}">${item.name}</div>
                         <img src="${tc.toDataURL()}" style="display:block;margin:7px auto;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.6));max-width:100%;height:auto;">
                         <div>${item.mutations.map(m => `<span class="mut-tag" data-class="${MUTATION_CLASSES[m.class].class}" style="background:${MUTATION_CLASSES[m.class].color}">${m.name}</span>`).join('')}</div>
                         <div style="font-size:0.75rem;color:#888;margin-top:6px">⚖️ ${item.maxWeight}kg &nbsp;·&nbsp; 📍 ${item.areaCaught}</div>
                         <div style="font-size:0.75rem;color:#888">💵 <span style="color:#facc15">$${item.maxValue.toLocaleString()}</span> &nbsp;·&nbsp; ×${item.count}</div>
                     </div>`;
-            });
-            if (!list.length) grid.innerHTML = '<div style="color:#444;font-style:italic;padding:20px;text-align:center">Cast a line to fill your index!</div>';
-        }
+                });
+                if (!list.length) grid.innerHTML = '<div style="color:#444;font-style:italic;padding:20px;text-align:center">Cast a line to fill your index!</div>';
+            }
 
-        abbreviate(n) {
-            if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
-            if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
-            if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
-            return n.toLocaleString();
-        }
+            abbreviate(n) {
+                if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+                if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+                if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+                return n.toLocaleString();
+            }
 
-        updateUI() {
-            document.getElementById('money-display').innerText = this.abbreviate(Math.floor(this.state.money));
-            document.getElementById('current-area-name').innerText = CONFIG.areas[this.state.currentArea].emoji + ' ' + CONFIG.areas[this.state.currentArea].name;
-            document.getElementById('level-display').innerText = this.state.level;
-            document.getElementById('level-badge-value').innerText = this.state.level;
-            document.getElementById('total-caught-display').innerText = this.state.totalCaught;
-            document.getElementById('total-earned-display').innerText = '$' + this.abbreviate(this.state.totalEarned);
-            document.getElementById('best-combo-display').innerText = this.state.bestCombo + 'x';
-            const rod = CONFIG.rods[this.state.equippedRod];
-            document.getElementById('stat-rod').innerText = rod.name;
-            document.getElementById('stat-hooks').innerText = rod.hooks;
-            document.getElementById('stat-luck').innerText = '+' + (rod.luckBonus + (this.state.upgrades.luck * 4)) + '%';
-            document.getElementById('stat-auto').innerText = this.state.upgrades.auto > 0 ? 'Lv.' + this.state.upgrades.auto : 'Off';
-            const wd = WEATHERS[this.state.weather];
-            document.getElementById('weather-display').innerText = this.state.weather;
-            document.getElementById('weather-effect-display').innerText = wd.desc;
-            document.getElementById('weather-banner').innerText = wd.emoji + ' ' + this.state.weather;
-            document.getElementById('weather-banner').style.color = this.state.weather === 'Bloodmoon' ? '#ef4444' : this.state.weather === 'Eclipse' ? '#818cf8' : this.state.weather === 'Blizzard' ? '#bae6fd' : '#e2e8f0';
-            const needed = this.state.level * 120 + Math.pow(this.state.level, 1.8) * 8;
-            const pct = Math.min(100, (this.state.xp / needed) * 100);
-            document.getElementById('xp-bar-fill').style.width = pct + '%';
-        }
+            updateUI() {
+                document.getElementById('money-display').innerText = this.abbreviate(Math.floor(this.state.money));
+                document.getElementById('current-area-name').innerText = CONFIG.areas[this.state.currentArea].emoji + ' ' + CONFIG.areas[this.state.currentArea].name;
+                document.getElementById('level-display').innerText = this.state.level;
+                document.getElementById('level-badge-value').innerText = this.state.level;
+                document.getElementById('total-caught-display').innerText = this.state.totalCaught;
+                document.getElementById('total-earned-display').innerText = '$' + this.abbreviate(this.state.totalEarned);
+                document.getElementById('best-combo-display').innerText = this.state.bestCombo + 'x';
+                const rod = CONFIG.rods[this.state.equippedRod];
+                document.getElementById('stat-rod').innerText = rod.name;
+                document.getElementById('stat-hooks').innerText = rod.hooks;
+                document.getElementById('stat-luck').innerText = '+' + (rod.luckBonus + (this.state.upgrades.luck * 4)) + '%';
+                document.getElementById('stat-auto').innerText = this.state.upgrades.auto > 0 ? 'Lv.' + this.state.upgrades.auto : 'Off';
+                const wd = WEATHERS[this.state.weather];
+                document.getElementById('weather-display').innerText = this.state.weather;
+                document.getElementById('weather-effect-display').innerText = wd.desc;
+                document.getElementById('weather-banner').innerText = wd.emoji + ' ' + this.state.weather;
+                document.getElementById('weather-banner').style.color = this.state.weather === 'Bloodmoon' ? '#ef4444' : this.state.weather === 'Eclipse' ? '#818cf8' : this.state.weather === 'Blizzard' ? '#bae6fd' : '#e2e8f0';
+                const needed = this.state.level * 120 + Math.pow(this.state.level, 1.8) * 8;
+                const pct = Math.min(100, (this.state.xp / needed) * 100);
+                document.getElementById('xp-bar-fill').style.width = pct + '%';
+            }
 
-        renderShop() {
-            // RODS - with level requirements enforced
-            let rh = '';
-            CONFIG.rods.forEach((rod, i) => {
-                const owned = this.state.ownedRods.includes(i);
-                const eqd = this.state.equippedRod === i;
-                const af = this.state.money >= rod.cost || rod.cost === 0;
-                const canAfford = this.state.level >= rod.levelReq && (af || owned);
-                const displayName = owned ? rod.name : `??? (Level ${rod.levelReq})`;
-                const displayDesc = owned ? rod.desc : "???";
-                const displayHooks = owned ? rod.hooks : "?";
-                const displayWeight = owned ? (rod.maxWeight >= 1000 ? (rod.maxWeight / 1000).toFixed(0) + 't' : rod.maxWeight + 'kg') : "???";
-                const displayLinger = owned ? (rod.linger / 1000).toFixed(1) + 's' : "???";
-                const displayLuck = owned ? `+${rod.luckBonus}%` : "???";
+            renderShop() {
+                // RODS - with level requirements enforced
+                let rh = '';
+                CONFIG.rods.forEach((rod, i) => {
+                    const owned = this.state.ownedRods.includes(i);
+                    const eqd = this.state.equippedRod === i;
+                    const af = this.state.money >= rod.cost || rod.cost === 0;
+                    const canAfford = this.state.level >= rod.levelReq && (af || owned);
+                    const displayName = owned ? rod.name : `??? (Level ${rod.levelReq})`;
+                    const displayDesc = owned ? rod.desc : "???";
+                    const displayHooks = owned ? rod.hooks : "?";
+                    const displayWeight = owned ? (rod.maxWeight >= 1000 ? (rod.maxWeight / 1000).toFixed(0) + 't' : rod.maxWeight + 'kg') : "???";
+                    const displayLinger = owned ? (rod.linger / 1000).toFixed(1) + 's' : "???";
+                    const displayLuck = owned ? `+${rod.luckBonus}%` : "???";
 
-                rh += `<div class="upgrade-item" style="opacity: ${owned ? 1 : 0.7}">
+                    rh += `<div class="upgrade-item" style="opacity: ${owned ? 1 : 0.7}">
                         <div class="item-header" style="color:${eqd ? '#00b0f0' : (owned ? '#fff' : '#888')}">
                             ${displayName}${eqd ? ' <span style="font-size:0.64rem;color:#00b0f0">[EQUIPPED]</span>' : ''}
                             ${!owned ? `<span style="font-size:0.6rem;color:#facc15;margin-left:8px"><i class="fa-solid fa-lock"></i> Locked</span>` : ''}
@@ -2904,51 +2910,51 @@
                             ${!owned ? `<span style="color:#facc15;font-size:0.7rem;display:block;margin-top:4px"><i class="fa-solid fa-star"></i> Required: Level ${rod.levelReq}</span>` : ''}
                         </div>
                         ${eqd ? `<button class="btn-equipped" disabled><i class="fa-solid fa-check"></i> Equipped</button>`
-                        : owned ? `<button class="btn-equip" onclick="gameCore.equipRod(${i})"><i class="fa-solid fa-rotate"></i> Equip</button>`
-                            : `<button class="btn-buy" ${!canAfford ? 'disabled' : ''} onclick="gameCore.buyRod(${i},${rod.cost})">
+                            : owned ? `<button class="btn-equip" onclick="gameCore.equipRod(${i})"><i class="fa-solid fa-rotate"></i> Equip</button>`
+                                : `<button class="btn-buy" ${!canAfford ? 'disabled' : ''} onclick="gameCore.buyRod(${i},${rod.cost})">
                                     <i class="fa-solid fa-cart-shopping"></i> Buy — $${rod.cost.toLocaleString()}
                                     ${this.state.level < rod.levelReq ? ` (Need Lvl ${rod.levelReq})` : ''}
                                    </button>`}
                     </div>`;
-            });
-            document.getElementById('rods-list').innerHTML = rh;
+                });
+                document.getElementById('rods-list').innerHTML = rh;
 
-            // SKILLS - with better cost scaling
-            const UPGS = [
-                { id: 'line', name: 'Braided Line', desc: 'Widens catch zone (+8% per level)', icon: 'fa-solid fa-rope', base: 80, maxLevel: 12, benefit: 8 },
-                { id: 'reel', name: 'High-Speed Reel', desc: 'Fish bite 12% faster per level', icon: 'fa-solid fa-gear', base: 100, maxLevel: 10, benefit: 12 },
-                { id: 'luck', name: 'Shiny Lure', desc: '+3% rare luck per level', icon: 'fa-solid fa-star', base: 150, maxLevel: 20, benefit: 3 },
-                { id: 'auto', name: 'Fishing Net', desc: '$5/sec passive income per level', icon: 'fa-solid fa-fish-fins', base: 800, maxLevel: 10, benefit: 5 },
-                { id: 'depth', name: 'Deep-Sea Sonar', desc: '+2% rare luck & bigger fish', icon: 'fa-solid fa-satellite-dish', base: 400, maxLevel: 15, benefit: 2 },
-                { id: 'sonar', name: 'Bite Sensor', desc: 'Reduces wait time by 15% per level', icon: 'fa-solid fa-wifi', base: 600, maxLevel: 8, benefit: 15 },
-                { id: 'stormgear', name: 'Storm Gear', desc: '+10% bite window in bad weather', icon: 'fa-solid fa-shield', base: 500, maxLevel: 10, benefit: 10 },
-                { id: 'magnetism', name: 'Value Magnetism', desc: '+4% sell value per level', icon: 'fa-solid fa-magnet', base: 1200, maxLevel: 15, benefit: 4 },
-                { id: 'netweave', name: 'Net Weave', desc: 'Auto-fisher catches 20% rarer fish', icon: 'fa-solid fa-network-wired', base: 3000, maxLevel: 8, benefit: 20 },
-                { id: 'stabilizer', name: 'Cursor Stabilizer', desc: 'Slows cursor speed by 12% per level', icon: 'fa-solid fa-gauge-high', base: 250, maxLevel: 12, benefit: 12 }
-            ];
-            let uh = '';
-            UPGS.forEach(u => {
-                const lv = this.state.upgrades[u.id] || 0;
-                const cost = u.maxLevel && lv >= u.maxLevel ? 999999999 : Math.floor(u.base * Math.pow(1.55, lv));
-                const isMaxed = u.maxLevel && lv >= u.maxLevel;
-                uh += `<div class="upgrade-item">
+                // SKILLS - with better cost scaling
+                const UPGS = [
+                    { id: 'line', name: 'Braided Line', desc: 'Widens catch zone (+8% per level)', icon: 'fa-solid fa-rope', base: 80, maxLevel: 12, benefit: 8 },
+                    { id: 'reel', name: 'High-Speed Reel', desc: 'Fish bite 12% faster per level', icon: 'fa-solid fa-gear', base: 100, maxLevel: 10, benefit: 12 },
+                    { id: 'luck', name: 'Shiny Lure', desc: '+3% rare luck per level', icon: 'fa-solid fa-star', base: 150, maxLevel: 20, benefit: 3 },
+                    { id: 'auto', name: 'Fishing Net', desc: '$5/sec passive income per level', icon: 'fa-solid fa-fish-fins', base: 800, maxLevel: 10, benefit: 5 },
+                    { id: 'depth', name: 'Deep-Sea Sonar', desc: '+2% rare luck & bigger fish', icon: 'fa-solid fa-satellite-dish', base: 400, maxLevel: 15, benefit: 2 },
+                    { id: 'sonar', name: 'Bite Sensor', desc: 'Reduces wait time by 15% per level', icon: 'fa-solid fa-wifi', base: 600, maxLevel: 8, benefit: 15 },
+                    { id: 'stormgear', name: 'Storm Gear', desc: '+10% bite window in bad weather', icon: 'fa-solid fa-shield', base: 500, maxLevel: 10, benefit: 10 },
+                    { id: 'magnetism', name: 'Value Magnetism', desc: '+4% sell value per level', icon: 'fa-solid fa-magnet', base: 1200, maxLevel: 15, benefit: 4 },
+                    { id: 'netweave', name: 'Net Weave', desc: 'Auto-fisher catches 20% rarer fish', icon: 'fa-solid fa-network-wired', base: 3000, maxLevel: 8, benefit: 20 },
+                    { id: 'stabilizer', name: 'Cursor Stabilizer', desc: 'Slows cursor speed by 12% per level', icon: 'fa-solid fa-gauge-high', base: 250, maxLevel: 12, benefit: 12 }
+                ];
+                let uh = '';
+                UPGS.forEach(u => {
+                    const lv = this.state.upgrades[u.id] || 0;
+                    const cost = u.maxLevel && lv >= u.maxLevel ? 999999999 : Math.floor(u.base * Math.pow(1.55, lv));
+                    const isMaxed = u.maxLevel && lv >= u.maxLevel;
+                    uh += `<div class="upgrade-item">
                         <div class="item-header"><i class="${u.icon}"></i> &nbsp;${u.name} <span style="color:#00b0f0;font-size:0.8rem;font-weight:normal">Lv.${lv}${isMaxed ? ' [MAX]' : ''}</span></div>
                         <div class="item-stats">${u.desc}${u.maxLevel ? `<br><span style="color:#666">Max: ${u.maxLevel}</span>` : ''}</div>
                         ${isMaxed ? `<button class="btn-equipped" disabled><i class="fa-solid fa-check"></i> Maxed</button>`
-                        : `<button class="btn-buy" ${this.state.money < cost ? 'disabled' : ''} onclick="gameCore.buyUpgrade('${u.id}',${cost})">
+                            : `<button class="btn-buy" ${this.state.money < cost ? 'disabled' : ''} onclick="gameCore.buyUpgrade('${u.id}',${cost})">
                             <i class="fa-solid fa-arrow-up"></i> Upgrade — $${cost.toLocaleString()}</button>`}
                     </div>`;
-            });
-            document.getElementById('upgrades-list').innerHTML = uh;
+                });
+                document.getElementById('upgrades-list').innerHTML = uh;
 
-            // BAIT
-            let bh = '';
-            Object.entries(BAITS).forEach(([name, b]) => {
-                const active = this.state.activeBait === name;
-                const inventory = this.state.baitInventory?.[name] || 0;
-                const aff = this.state.money >= b.cost;
+                // BAIT
+                let bh = '';
+                Object.entries(BAITS).forEach(([name, b]) => {
+                    const active = this.state.activeBait === name;
+                    const inventory = this.state.baitInventory?.[name] || 0;
+                    const aff = this.state.money >= b.cost;
 
-                bh += `<div class="upgrade-item">
+                    bh += `<div class="upgrade-item">
         <div class="item-header" style="color:${active ? '#4ade80' : '#fff'}">
             ${b.emoji} ${name}
             <span style="font-size:0.7rem;color:#888;float:right">Own: ${inventory}</span>
@@ -2959,27 +2965,27 @@
                 <i class="fa-solid fa-cart-shopping"></i> Buy (x5) — $${(b.cost * 5).toLocaleString()}
             </button>
             ${inventory > 0 && !active ?
-                        `<button class="btn-equip" onclick="gameCore.equipBait('${name}')" style="flex:1">Equip</button>` :
-                        active ? `<button class="btn-equipped" disabled style="flex:1">Active (${this.state.baitUses} left)</button>` :
-                            `<button class="btn-equipped" disabled style="flex:1;opacity:0.5">-</button>`
-                    }
+                            `<button class="btn-equip" onclick="gameCore.equipBait('${name}')" style="flex:1">Equip</button>` :
+                            active ? `<button class="btn-equipped" disabled style="flex:1">Active (${this.state.baitUses} left)</button>` :
+                                `<button class="btn-equipped" disabled style="flex:1;opacity:0.5">-</button>`
+                        }
         </div>
     </div>`;
-            });
-            document.getElementById('bait-list').innerHTML = bh;
+                });
+                document.getElementById('bait-list').innerHTML = bh;
 
-            // AREAS - with level and cost requirements
-            let ah = '';
-            CONFIG.areas.forEach((area, i) => {
-                const ul = this.state.unlockedAreas.includes(i);
-                const cu = this.state.level >= area.minLevel && this.state.money >= area.unlockCost;
-                const ia = this.state.currentArea === i;
-                const displayName = ul ? `${area.emoji} ${area.name}` : `${area.emoji} ???`;
-                const displayMult = ul ? `×${area.fishMult}` : "???";
-                const maxRarity = ul ? CONFIG.rarities[area.maxRarity].color : '#666';
+                // AREAS - with level and cost requirements
+                let ah = '';
+                CONFIG.areas.forEach((area, i) => {
+                    const ul = this.state.unlockedAreas.includes(i);
+                    const cu = this.state.level >= area.minLevel && this.state.money >= area.unlockCost;
+                    const ia = this.state.currentArea === i;
+                    const displayName = ul ? `${area.emoji} ${area.name}` : `${area.emoji} ???`;
+                    const displayMult = ul ? `×${area.fishMult}` : "???";
+                    const maxRarity = ul ? CONFIG.rarities[area.maxRarity].color : '#666';
 
-                if (ul) {
-                    ah += `<div class="upgrade-item">
+                    if (ul) {
+                        ah += `<div class="upgrade-item">
                             <div class="item-header" style="color:${ia ? '#4ade80' : '#fff'}">${displayName}</div>
                             <div class="item-stats">
                                 <i class="fa-solid fa-arrow-trend-up"></i> ${displayMult} value &nbsp;·&nbsp; 
@@ -2989,8 +2995,8 @@
                             <button class="${ia ? 'btn-equipped' : 'btn-equip'}" ${ia ? 'disabled' : ''} onclick="gameCore.travelTo(${i})">
                                 ${ia ? '<i class="fa-solid fa-location-dot"></i> Current' : '<i class="fa-solid fa-sailboat"></i> Travel Here'}</button>
                         </div>`;
-                } else {
-                    ah += `<div class="upgrade-item" style="opacity:0.65">
+                    } else {
+                        ah += `<div class="upgrade-item" style="opacity:0.65">
                             <div class="item-header" style="color:#444">${displayName}</div>
                             <div class="item-stats">
                                 <i class="fa-solid fa-lock"></i> Lv.${area.minLevel} &nbsp;·&nbsp; 
@@ -3002,489 +3008,489 @@
                                 ${this.state.level < area.minLevel ? ` (Need Lvl ${area.minLevel})` : ''}
                             </button>
                         </div>`;
-                }
-            });
-            document.getElementById('areas-list').innerHTML = ah;
-        }
-
-        equipBait(name) {
-            if (this.state.baitInventory[name] > 0) {
-                this.state.activeBait = name;
-                this.state.baitUses = this.state.baitInventory[name];
-                this.updateUI();
-                this.renderShop();
-                this.log(`Equipped ${name}!`, '#4ade80');
+                    }
+                });
+                document.getElementById('areas-list').innerHTML = ah;
             }
-        }
 
-        buyRod(i, cost) {
-            const rod = CONFIG.rods[i];
-            if (this.state.level < rod.levelReq) {
-                this.log(`Need level ${rod.levelReq} to buy ${rod.name}!`, "#f87171");
-                return;
-            }
-            if (this.state.money >= cost && !this.state.ownedRods.includes(i)) {
-                this.state.money -= cost;
-                this.state.ownedRods.push(i);
-                this.state.equippedRod = i;
-                this.updateUI();
-                this.renderShop();
-                this.log('Bought ' + CONFIG.rods[i].name + '!', '#4ade80');
-            }
-        }
-
-        equipRod(i) {
-            const rod = CONFIG.rods[i];
-            if (this.state.level < rod.levelReq) {
-                this.log(`Cannot equip ${rod.name} - Need level ${rod.levelReq}!`, "#f87171");
-                return;
-            }
-            if (this.state.ownedRods.includes(i)) {
-                this.state.equippedRod = i;
-                this.updateUI();
-                this.renderShop();
-                this.log(`Equipped ${rod.name}!`, '#4ade80');
-            }
-        }
-
-        buyUpgrade(id, cost) {
-            const UPGS = {
-                line: { maxLevel: 10 }, reel: { maxLevel: 10 }, luck: { maxLevel: 15 },
-                auto: { maxLevel: 8 }, depth: { maxLevel: 12 }, sonar: { maxLevel: 10 },
-                stormgear: { maxLevel: 10 }, magnetism: { maxLevel: 12 }, netweave: { maxLevel: 8 }, stabilizer: { maxLevel: 10 }
-            };
-            const lv = this.state.upgrades[id] || 0;
-            if (UPGS[id] && lv >= UPGS[id].maxLevel) return;
-
-            if (this.state.money >= cost) {
-                this.state.money -= cost;
-                if (!this.state.upgrades[id]) this.state.upgrades[id] = 0;
-                this.state.upgrades[id]++;
-                this.updateUI();
-                this.renderShop();
-                this.log('Upgraded!', '#4ade80');
-            }
-        }
-
-        buyBait(name) {
-            const b = BAITS[name];
-            const stackSize = 5; // Can buy up to 5 at once
-
-            if (this.state.money >= b.cost * stackSize) {
-                const buyAmount = Math.min(stackSize, Math.floor(this.state.money / b.cost));
-                this.state.money -= b.cost * buyAmount;
-                this.state.baitInventory[name] = (this.state.baitInventory[name] || 0) + buyAmount;
-
-                // Auto-equip if no bait active
-                if (!this.state.activeBait) {
+            equipBait(name) {
+                if (this.state.baitInventory[name] > 0) {
                     this.state.activeBait = name;
                     this.state.baitUses = this.state.baitInventory[name];
+                    this.updateUI();
+                    this.renderShop();
+                    this.log(`Equipped ${name}!`, '#4ade80');
                 }
-
-                this.updateUI();
-                this.renderShop();
-                this.log(`Bought ${buyAmount}x ${name}!`, '#4ade80');
             }
-        }
 
-        travelTo(i) {
-            const area = CONFIG.areas[i];
-            if (this.state.level < area.minLevel) {
-                this.log(`Need level ${area.minLevel} to travel to ${area.name}!`, "#f87171");
-                return;
+            buyRod(i, cost) {
+                const rod = CONFIG.rods[i];
+                if (this.state.level < rod.levelReq) {
+                    this.log(`Need level ${rod.levelReq} to buy ${rod.name}!`, "#f87171");
+                    return;
+                }
+                if (this.state.money >= cost && !this.state.ownedRods.includes(i)) {
+                    this.state.money -= cost;
+                    this.state.ownedRods.push(i);
+                    this.state.equippedRod = i;
+                    this.updateUI();
+                    this.renderShop();
+                    this.log('Bought ' + CONFIG.rods[i].name + '!', '#4ade80');
+                }
             }
-            this.state.currentArea = i;
-            this.updateUI();
-            this.renderShop();
-        }
 
-        unlockArea(i, cost) {
-            const area = CONFIG.areas[i];
-            if (this.state.level < area.minLevel) {
-                this.log(`Need level ${area.minLevel} to unlock ${area.name}!`, "#f87171");
-                return;
+            equipRod(i) {
+                const rod = CONFIG.rods[i];
+                if (this.state.level < rod.levelReq) {
+                    this.log(`Cannot equip ${rod.name} - Need level ${rod.levelReq}!`, "#f87171");
+                    return;
+                }
+                if (this.state.ownedRods.includes(i)) {
+                    this.state.equippedRod = i;
+                    this.updateUI();
+                    this.renderShop();
+                    this.log(`Equipped ${rod.name}!`, '#4ade80');
+                }
             }
-            if (this.state.money >= cost) {
-                this.state.money -= cost;
-                this.state.unlockedAreas.push(i);
+
+            buyUpgrade(id, cost) {
+                const UPGS = {
+                    line: { maxLevel: 10 }, reel: { maxLevel: 10 }, luck: { maxLevel: 15 },
+                    auto: { maxLevel: 8 }, depth: { maxLevel: 12 }, sonar: { maxLevel: 10 },
+                    stormgear: { maxLevel: 10 }, magnetism: { maxLevel: 12 }, netweave: { maxLevel: 8 }, stabilizer: { maxLevel: 10 }
+                };
+                const lv = this.state.upgrades[id] || 0;
+                if (UPGS[id] && lv >= UPGS[id].maxLevel) return;
+
+                if (this.state.money >= cost) {
+                    this.state.money -= cost;
+                    if (!this.state.upgrades[id]) this.state.upgrades[id] = 0;
+                    this.state.upgrades[id]++;
+                    this.updateUI();
+                    this.renderShop();
+                    this.log('Upgraded!', '#4ade80');
+                }
+            }
+
+            buyBait(name) {
+                const b = BAITS[name];
+                const stackSize = 5; // Can buy up to 5 at once
+
+                if (this.state.money >= b.cost * stackSize) {
+                    const buyAmount = Math.min(stackSize, Math.floor(this.state.money / b.cost));
+                    this.state.money -= b.cost * buyAmount;
+                    this.state.baitInventory[name] = (this.state.baitInventory[name] || 0) + buyAmount;
+
+                    // Auto-equip if no bait active
+                    if (!this.state.activeBait) {
+                        this.state.activeBait = name;
+                        this.state.baitUses = this.state.baitInventory[name];
+                    }
+
+                    this.updateUI();
+                    this.renderShop();
+                    this.log(`Bought ${buyAmount}x ${name}!`, '#4ade80');
+                }
+            }
+
+            travelTo(i) {
+                const area = CONFIG.areas[i];
+                if (this.state.level < area.minLevel) {
+                    this.log(`Need level ${area.minLevel} to travel to ${area.name}!`, "#f87171");
+                    return;
+                }
                 this.state.currentArea = i;
                 this.updateUI();
                 this.renderShop();
             }
-        }
 
-        log(msg, color = '#94a3b8') {
-            const tc = document.getElementById('toast-container');
-            const e = document.createElement('div');
-            e.className = 'game-toast';
-            e.style.color = color;
-            e.innerText = msg;
-            tc.prepend(e);
-            setTimeout(() => e.remove(), 2800);
-            while (tc.childNodes.length > 3) tc.removeChild(tc.lastChild);
-        }
-
-        spawnSplash(x, y, n) {
-            for (let i = 0; i < n; i++) this.particles.push({
-                x, y,
-                vx: (Math.random() - 0.5) * 10,
-                vy: -3 - Math.random() * 7,
-                life: 1,
-                color: `hsl(${200 + Math.random() * 40},80%,70%)`
-            });
-        }
-
-        createNotif(text, x, y, color) {
-            const n = document.createElement('div');
-            n.className = 'notif';
-            n.style.left = x + 'px';
-            n.style.top = y + 'px';
-            n.style.color = color;
-            n.innerText = text;
-            document.body.appendChild(n);
-            setTimeout(() => n.remove(), 1500);
-        }
-
-        flashScreen(color) {
-            const f = document.getElementById('flash-overlay');
-            f.style.background = color;
-            f.style.opacity = '1';
-            setTimeout(() => f.style.opacity = '0', 90);
-        }
-
-        save() {
-            if (this.state?.slotName) {
-                SaveSystem.saveSlot(this.state.slotName, this.state);
-            }
-        }
-
-        // Drawing methods (preserved from original)
-        loop(ts) {
-            const dt = Math.min(ts - this.lastTime, 80);
-            this.lastTime = ts;
-            this.update(dt, ts);
-            this.draw(ts);
-            this.animFrame = requestAnimationFrame(t => this.loop(t));
-        }
-
-        update(dt, ts) {
-            this.waveOffset += dt * 0.0008;
-            this.castArcProg = Math.min(1, this.castArcProg + dt * 0.003);
-
-            if (this.state.upgrades.auto > 0) {
-                this.autoFisherTimer += dt;
-                if (this.autoFisherTimer > 4000) { // Slower auto-fish
-                    const gain = this.state.upgrades.auto * (4 + (this.state.upgrades.netweave || 0) * 1.8) * CONFIG.areas[this.state.currentArea].fishMult * WEATHERS[this.state.weather].valueMult;
-                    this.state.money += gain;
-                    this.state.totalEarned += gain;
-                    this.autoFisherTimer = 0;
+            unlockArea(i, cost) {
+                const area = CONFIG.areas[i];
+                if (this.state.level < area.minLevel) {
+                    this.log(`Need level ${area.minLevel} to unlock ${area.name}!`, "#f87171");
+                    return;
+                }
+                if (this.state.money >= cost) {
+                    this.state.money -= cost;
+                    this.state.unlockedAreas.push(i);
+                    this.state.currentArea = i;
                     this.updateUI();
+                    this.renderShop();
                 }
             }
 
-            const wd = WEATHERS[this.state.weather];
-            if (wd.rain || wd.snow) for (let i = 0; i < 2; i++) this.spawnWP();
-            for (let i = this.weatherParticles.length - 1; i >= 0; i--) {
-                const p = this.weatherParticles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                if (p.y > this.canvas.height + 10) this.weatherParticles.splice(i, 1);
-            }
-            if (this.weatherParticles.length > 250) this.weatherParticles.splice(0, 40);
-
-            if (wd.lightning && Math.random() < dt * 0.0001) {
-                this.lightningFlash = 0.9;
-                this.flashScreen('rgba(150,150,255,0.2)');
-            }
-            if (this.lightningFlash > 0) this.lightningFlash = Math.max(0, this.lightningFlash - dt * 0.005);
-
-            for (let i = this.ripples.length - 1; i >= 0; i--) {
-                const rp = this.ripples[i];
-                rp.r += dt * 0.06;
-                rp.alpha -= dt * 0.0006;
-                if (rp.alpha <= 0) this.ripples.splice(i, 1);
+            log(msg, color = '#94a3b8') {
+                const tc = document.getElementById('toast-container');
+                const e = document.createElement('div');
+                e.className = 'game-toast';
+                e.style.color = color;
+                e.innerText = msg;
+                tc.prepend(e);
+                setTimeout(() => e.remove(), 2800);
+                while (tc.childNodes.length > 3) tc.removeChild(tc.lastChild);
             }
 
-            for (let i = this.yankedFishes.length - 1; i >= 0; i--) {
-                const yf = this.yankedFishes[i];
-                yf.x += yf.vx;
-                yf.vy += 0.45 * (dt / 16.66);
-                yf.y += yf.vy * (dt / 16.66);
-                yf.rotation += yf.rotSpeed * (dt / 16.66);
-                yf.life -= dt / 2800;
-                if (yf.life <= 0) this.yankedFishes.splice(i, 1);
+            spawnSplash(x, y, n) {
+                for (let i = 0; i < n; i++) this.particles.push({
+                    x, y,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: -3 - Math.random() * 7,
+                    life: 1,
+                    color: `hsl(${200 + Math.random() * 40},80%,70%)`
+                });
             }
 
-            for (let i = this.particles.length - 1; i >= 0; i--) {
-                const p = this.particles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                p.vy += 0.2;
-                p.life -= dt * 0.025;
-                if (p.life <= 0) this.particles.splice(i, 1);
+            createNotif(text, x, y, color) {
+                const n = document.createElement('div');
+                n.className = 'notif';
+                n.style.left = x + 'px';
+                n.style.top = y + 'px';
+                n.style.color = color;
+                n.innerText = text;
+                document.body.appendChild(n);
+                setTimeout(() => n.remove(), 1500);
             }
 
-            if (this.fishingState === 'IDLE') return;
+            flashScreen(color) {
+                const f = document.getElementById('flash-overlay');
+                f.style.background = color;
+                f.style.opacity = '1';
+                setTimeout(() => f.style.opacity = '0', 90);
+            }
 
-            let anyBites = false, allEsc = true;
-            this.hooks.forEach(h => {
-                h.offset = Math.sin(ts / 600) * 6;
-                h.bobble = Math.sin(ts / 280) * 2.5;
-                if (h.state === 'CASTING') {
-                    h.y += (h.targetY - h.y) * 0.12;
-                    allEsc = false;
+            save() {
+                if (this.state?.slotName) {
+                    SaveSystem.saveSlot(this.state.slotName, this.state);
                 }
-                else if (h.state === 'WAITING') {
-                    allEsc = false;
-                    h.biteTimer -= dt;
-                    if (h.biteTimer <= 0) {
-                        h.state = 'BITE';
-                        this.fishingState = 'BITE';
-                        this.spawnSplash(h.x, h.y, 16);
-                        h.biteWindow = h.lingerTime;
-                        this.ripples.push({ x: h.x, y: h.y, r: 0, alpha: 1 });
-                    }
-                } else if (h.state === 'BITE') {
-                    allEsc = false;
-                    anyBites = true;
-                    h.biteWindow -= dt;
-                    if (h.biteWindow <= 0) {
-                        h.state = 'ESCAPED';
-                        this.spawnSplash(h.x, h.y, 8);
+            }
+
+            // Drawing methods (preserved from original)
+            loop(ts) {
+                const dt = Math.min(ts - this.lastTime, 80);
+                this.lastTime = ts;
+                this.update(dt, ts);
+                this.draw(ts);
+                this.animFrame = requestAnimationFrame(t => this.loop(t));
+            }
+
+            update(dt, ts) {
+                this.waveOffset += dt * 0.0008;
+                this.castArcProg = Math.min(1, this.castArcProg + dt * 0.003);
+
+                if (this.state.upgrades.auto > 0) {
+                    this.autoFisherTimer += dt;
+                    if (this.autoFisherTimer > 4000) { // Slower auto-fish
+                        const gain = this.state.upgrades.auto * (4 + (this.state.upgrades.netweave || 0) * 1.8) * CONFIG.areas[this.state.currentArea].fishMult * WEATHERS[this.state.weather].valueMult;
+                        this.state.money += gain;
+                        this.state.totalEarned += gain;
+                        this.autoFisherTimer = 0;
+                        this.updateUI();
                     }
                 }
-            });
-            if (this.fishingState === 'BITE' && !anyBites && allEsc) {
-                this.fishingState = 'IDLE';
-                this.log("It got away...", "#94a3b8");
-                this.combo = 0;
-            }
-            else if (this.fishingState === 'REELING') {
-                this.miniGame.cursor += this.miniGame.speed * this.miniGame.dir * (dt / 16.66);
-                if (this.miniGame.cursor > 100 || this.miniGame.cursor < 0) {
-                    this.miniGame.dir *= -1;
-                    this.miniGame.cursor = Math.max(0, Math.min(100, this.miniGame.cursor));
+
+                const wd = WEATHERS[this.state.weather];
+                if (wd.rain || wd.snow) for (let i = 0; i < 2; i++) this.spawnWP();
+                for (let i = this.weatherParticles.length - 1; i >= 0; i--) {
+                    const p = this.weatherParticles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.y > this.canvas.height + 10) this.weatherParticles.splice(i, 1);
                 }
-                document.getElementById('timing-cursor').style.left = this.miniGame.cursor + '%';
-                if (this.miniGame.zenTimer > 0) this.miniGame.zenTimer -= dt / 1000;
-                else if (this.miniGame.freezeTimer > 0) this.miniGame.freezeTimer -= dt / 1000;
-                else this.miniGame.progress -= this.miniGame.drainRate * (dt / 1000);
-                if (this.miniGame.progress <= 0) this.escapeFish();
-                const pct = Math.max(0, Math.min(100, (this.miniGame.progress / this.miniGame.maxProgress) * 100));
-                document.getElementById('catch-progress-fill').style.width = pct + '%';
-                document.getElementById('catch-pct').innerText = Math.floor(pct) + '%';
-            }
-        }
+                if (this.weatherParticles.length > 250) this.weatherParticles.splice(0, 40);
 
-        draw(ts) {
-            const ctx = this.ctx, w = this.canvas.width, h = this.canvas.height;
-            const area = CONFIG.areas[this.state.currentArea];
-            const wd = WEATHERS[this.state.weather];
-
-            const g = ctx.createLinearGradient(0, 0, 0, h);
-            g.addColorStop(0, area.skyTop); g.addColorStop(0.55, area.skyMid); g.addColorStop(1, area.skyBot);
-            ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
-
-            if (area.skyTop === '#000000' || area.skyTop === '#050514' || area.skyTop === '#020617') {
-                ctx.save();
-                for (let i = 0; i < 90; i++) {
-                    const sx = (i * 137.5) % w, sy = (i * 97.3) % (h * 0.5);
-                    const pulse = 0.4 + 0.6 * Math.sin(ts / 900 + i);
-                    ctx.fillStyle = `rgba(255,255,255,${pulse * 0.75})`; ctx.fillRect(sx, sy, 1.5, 1.5);
+                if (wd.lightning && Math.random() < dt * 0.0001) {
+                    this.lightningFlash = 0.9;
+                    this.flashScreen('rgba(150,150,255,0.2)');
                 }
-                ctx.restore();
-            }
+                if (this.lightningFlash > 0) this.lightningFlash = Math.max(0, this.lightningFlash - dt * 0.005);
 
-            if (this.state.weather === 'Bloodmoon' || this.state.weather === 'Eclipse') {
-                const col = this.state.weather === 'Bloodmoon' ? '#ef4444' : '#4338ca';
-                const glow = this.state.weather === 'Bloodmoon' ? '#b91c1c' : '#312e81';
-                ctx.save(); ctx.shadowBlur = 50; ctx.shadowColor = glow;
-                ctx.beginPath(); ctx.arc(w * 0.82, h * 0.1, 26, 0, Math.PI * 2); ctx.fillStyle = col; ctx.fill();
-                ctx.restore();
-            }
-
-            const waterY = h * 0.52;
-            const wg = ctx.createLinearGradient(0, waterY, 0, h);
-            wg.addColorStop(0, area.waterCol + 'dd'); wg.addColorStop(0.6, area.waterCol + '88'); wg.addColorStop(1, '#000000');
-            ctx.fillStyle = wg; ctx.fillRect(0, waterY, w, h - waterY);
-
-            for (let layer = 0; layer < 4; layer++) {
-                const speed = [1, 1.7, 2.5, 3.2][layer], amp = [10, 6, 4, 2.5][layer], alpha = [0.18, 0.12, 0.07, 0.04][layer];
-                ctx.beginPath(); ctx.moveTo(0, waterY);
-                for (let x = 0; x <= w; x += 5) {
-                    const y = waterY + amp * Math.sin((x / w) * Math.PI * 4 + this.waveOffset * speed + layer * 1.3);
-                    x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                for (let i = this.ripples.length - 1; i >= 0; i--) {
+                    const rp = this.ripples[i];
+                    rp.r += dt * 0.06;
+                    rp.alpha -= dt * 0.0006;
+                    if (rp.alpha <= 0) this.ripples.splice(i, 1);
                 }
-                ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
-                ctx.fillStyle = `rgba(255,255,255,${alpha})`; ctx.fill();
+
+                for (let i = this.yankedFishes.length - 1; i >= 0; i--) {
+                    const yf = this.yankedFishes[i];
+                    yf.x += yf.vx;
+                    yf.vy += 0.45 * (dt / 16.66);
+                    yf.y += yf.vy * (dt / 16.66);
+                    yf.rotation += yf.rotSpeed * (dt / 16.66);
+                    yf.life -= dt / 2800;
+                    if (yf.life <= 0) this.yankedFishes.splice(i, 1);
+                }
+
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const p = this.particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.2;
+                    p.life -= dt * 0.025;
+                    if (p.life <= 0) this.particles.splice(i, 1);
+                }
+
+                if (this.fishingState === 'IDLE') return;
+
+                let anyBites = false, allEsc = true;
+                this.hooks.forEach(h => {
+                    h.offset = Math.sin(ts / 600) * 6;
+                    h.bobble = Math.sin(ts / 280) * 2.5;
+                    if (h.state === 'CASTING') {
+                        h.y += (h.targetY - h.y) * 0.12;
+                        allEsc = false;
+                    }
+                    else if (h.state === 'WAITING') {
+                        allEsc = false;
+                        h.biteTimer -= dt;
+                        if (h.biteTimer <= 0) {
+                            h.state = 'BITE';
+                            this.fishingState = 'BITE';
+                            this.spawnSplash(h.x, h.y, 16);
+                            h.biteWindow = h.lingerTime;
+                            this.ripples.push({ x: h.x, y: h.y, r: 0, alpha: 1 });
+                        }
+                    } else if (h.state === 'BITE') {
+                        allEsc = false;
+                        anyBites = true;
+                        h.biteWindow -= dt;
+                        if (h.biteWindow <= 0) {
+                            h.state = 'ESCAPED';
+                            this.spawnSplash(h.x, h.y, 8);
+                        }
+                    }
+                });
+                if (this.fishingState === 'BITE' && !anyBites && allEsc) {
+                    this.fishingState = 'IDLE';
+                    this.log("It got away...", "#94a3b8");
+                    this.combo = 0;
+                }
+                else if (this.fishingState === 'REELING') {
+                    this.miniGame.cursor += this.miniGame.speed * this.miniGame.dir * (dt / 16.66);
+                    if (this.miniGame.cursor > 100 || this.miniGame.cursor < 0) {
+                        this.miniGame.dir *= -1;
+                        this.miniGame.cursor = Math.max(0, Math.min(100, this.miniGame.cursor));
+                    }
+                    document.getElementById('timing-cursor').style.left = this.miniGame.cursor + '%';
+                    if (this.miniGame.zenTimer > 0) this.miniGame.zenTimer -= dt / 1000;
+                    else if (this.miniGame.freezeTimer > 0) this.miniGame.freezeTimer -= dt / 1000;
+                    else this.miniGame.progress -= this.miniGame.drainRate * (dt / 1000);
+                    if (this.miniGame.progress <= 0) this.escapeFish();
+                    const pct = Math.max(0, Math.min(100, (this.miniGame.progress / this.miniGame.maxProgress) * 100));
+                    document.getElementById('catch-progress-fill').style.width = pct + '%';
+                    document.getElementById('catch-pct').innerText = Math.floor(pct) + '%';
+                }
             }
 
-            ctx.save();
-            for (let i = 0; i < 14; i++) {
-                const sx = ((i * w / 13) + Math.sin(ts / 1200 + i) * 25 + this.waveOffset * 20) % w;
-                const sy = waterY + 8 + Math.sin(ts / 800 + i * 1.5) * 22;
-                ctx.fillStyle = `rgba(255,255,255,${0.06 + 0.1 * Math.sin(ts / 500 + i)})`;
-                ctx.fillRect(sx, sy, Math.sin(ts / 700 + i) * 28 + 38, 1.5);
-            }
-            ctx.restore();
+            draw(ts) {
+                const ctx = this.ctx, w = this.canvas.width, h = this.canvas.height;
+                const area = CONFIG.areas[this.state.currentArea];
+                const wd = WEATHERS[this.state.weather];
 
-            ctx.save(); ctx.globalAlpha = 0.055 + 0.03 * Math.sin(ts / 2000);
-            for (let i = 0; i < 6; i++) {
-                const fx = ((i * w * 0.2) + ts * 0.007 * (i % 2 === 0 ? 1 : -0.7)) % w;
-                const fy = waterY + 50 + i * 28 + Math.sin(ts / 1600 + i) * 18;
-                ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(fx, fy, 13 + i * 2, 5, 0, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.moveTo(fx - 13, fy); ctx.lineTo(fx - 20, fy - 4); ctx.lineTo(fx - 20, fy + 4); ctx.fill();
-            }
-            ctx.restore();
+                const g = ctx.createLinearGradient(0, 0, 0, h);
+                g.addColorStop(0, area.skyTop); g.addColorStop(0.55, area.skyMid); g.addColorStop(1, area.skyBot);
+                ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
 
-            this.ripples.forEach(rp => {
-                ctx.save(); ctx.beginPath(); ctx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
-                ctx.strokeStyle = `rgba(255,255,255,${rp.alpha})`; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore();
-            });
-
-            this.weatherParticles.forEach(p => {
-                ctx.save(); ctx.globalAlpha = p.alpha * 0.65;
-                if (p.sn) { ctx.fillStyle = '#e0f2fe'; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill(); }
-                else { ctx.strokeStyle = 'rgba(147,197,253,0.8)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + p.vx * 2, p.y + p.vy * 0.55); ctx.stroke(); }
-                ctx.restore();
-            });
-
-            if (this.lightningFlash > 0.25) {
-                ctx.save(); ctx.globalAlpha = this.lightningFlash * 0.9; ctx.strokeStyle = '#ddd6fe'; ctx.lineWidth = 2;
-                ctx.shadowBlur = 25; ctx.shadowColor = '#818cf8';
-                const lx = w * 0.35 + Math.random() * w * 0.3;
-                ctx.beginPath(); ctx.moveTo(lx, 0);
-                let cy2 = 0;
-                while (cy2 < waterY) { cy2 += 15 + Math.random() * 25; ctx.lineTo(lx + (Math.random() - 0.5) * 35, cy2); }
-                ctx.stroke(); ctx.restore();
-            }
-
-            if (wd.fogAlpha > 0) {
-                const fg = ctx.createLinearGradient(0, waterY - 80, 0, waterY + 120);
-                fg.addColorStop(0, 'rgba(180,200,220,0)'); fg.addColorStop(0.5, `rgba(180,200,220,${wd.fogAlpha})`); fg.addColorStop(1, 'rgba(180,200,220,0)');
-                ctx.fillStyle = fg; ctx.fillRect(0, waterY - 80, w, 200);
-            }
-
-            this.yankedFishes.forEach(yf => {
-                ctx.save(); ctx.translate(yf.x, yf.y); ctx.rotate(yf.rotation);
-                this.drawFishEntity(ctx, 0, 0, yf.size, yf.fishData, yf.life); ctx.restore();
-            });
-
-            if (this.fishingState !== 'IDLE' && this.hooks && this.hooks.length) {
-                const rodTipX = w * 0.5, rodTipY = h * 0.16;
-                this.hooks.forEach(hook => {
-                    if (hook.state === 'ESCAPED') return;
-                    const bx = hook.x;
-                    const by = hook.y + (hook.state === 'WAITING' || hook.state === 'BITE' ? hook.offset + hook.bobble : 0);
-                    ctx.beginPath();
-                    const cx2 = (rodTipX + bx) / 2 + Math.sin(ts / 900) * 18;
-                    const cy2 = rodTipY + (by - rodTipY) * 0.35 - 25;
-                    ctx.moveTo(rodTipX, rodTipY); ctx.quadraticCurveTo(cx2, cy2, bx, by);
-                    ctx.strokeStyle = `rgba(220,218,210,${hook.state === 'BITE' ? 0.9 : 0.5})`; ctx.lineWidth = 1.5; ctx.stroke();
-                    const biting = hook.state === 'BITE';
-                    ctx.save(); ctx.translate(bx, by);
-                    if (biting) ctx.rotate(Math.sin(ts / 75) * 0.35);
-                    if (biting) { ctx.shadowBlur = 18; ctx.shadowColor = '#ef4444'; }
-                    else { ctx.shadowBlur = 8; ctx.shadowColor = '#60a5fa'; }
-                    ctx.fillStyle = biting ? '#ef4444' : '#f0ede8';
-                    ctx.beginPath(); ctx.ellipse(0, 0, 9, 4.5, 0, 0, Math.PI * 2); ctx.fill();
-                    ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.beginPath(); ctx.ellipse(-1, -1.5, 4, 2, 0.4, 0, Math.PI * 2); ctx.fill();
-                    ctx.fillStyle = biting ? '#fca5a5' : '#93c5fd';
-                    ctx.beginPath(); ctx.moveTo(-9, 0); ctx.lineTo(-15, -5); ctx.lineTo(-15, 5); ctx.closePath(); ctx.fill();
-                    ctx.shadowBlur = 0; ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5;
-                    ctx.beginPath(); ctx.moveTo(5, 4.5); ctx.lineTo(5, 11); ctx.quadraticCurveTo(5, 16, 0, 16); ctx.stroke();
-                    if (biting) {
-                        const ring = Math.sin(ts / 80) * 0.5 + 0.5;
-                        ctx.strokeStyle = `rgba(239,68,68,${ring})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 18 + ring * 10, 0, Math.PI * 2); ctx.stroke();
-                        ctx.strokeStyle = `rgba(239,68,68,${ring * 0.4})`; ctx.beginPath(); ctx.arc(0, 0, 30 + ring * 10, 0, Math.PI * 2); ctx.stroke();
+                if (area.skyTop === '#000000' || area.skyTop === '#050514' || area.skyTop === '#020617') {
+                    ctx.save();
+                    for (let i = 0; i < 90; i++) {
+                        const sx = (i * 137.5) % w, sy = (i * 97.3) % (h * 0.5);
+                        const pulse = 0.4 + 0.6 * Math.sin(ts / 900 + i);
+                        ctx.fillStyle = `rgba(255,255,255,${pulse * 0.75})`; ctx.fillRect(sx, sy, 1.5, 1.5);
                     }
                     ctx.restore();
+                }
+
+                if (this.state.weather === 'Bloodmoon' || this.state.weather === 'Eclipse') {
+                    const col = this.state.weather === 'Bloodmoon' ? '#ef4444' : '#4338ca';
+                    const glow = this.state.weather === 'Bloodmoon' ? '#b91c1c' : '#312e81';
+                    ctx.save(); ctx.shadowBlur = 50; ctx.shadowColor = glow;
+                    ctx.beginPath(); ctx.arc(w * 0.82, h * 0.1, 26, 0, Math.PI * 2); ctx.fillStyle = col; ctx.fill();
+                    ctx.restore();
+                }
+
+                const waterY = h * 0.52;
+                const wg = ctx.createLinearGradient(0, waterY, 0, h);
+                wg.addColorStop(0, area.waterCol + 'dd'); wg.addColorStop(0.6, area.waterCol + '88'); wg.addColorStop(1, '#000000');
+                ctx.fillStyle = wg; ctx.fillRect(0, waterY, w, h - waterY);
+
+                for (let layer = 0; layer < 4; layer++) {
+                    const speed = [1, 1.7, 2.5, 3.2][layer], amp = [10, 6, 4, 2.5][layer], alpha = [0.18, 0.12, 0.07, 0.04][layer];
+                    ctx.beginPath(); ctx.moveTo(0, waterY);
+                    for (let x = 0; x <= w; x += 5) {
+                        const y = waterY + amp * Math.sin((x / w) * Math.PI * 4 + this.waveOffset * speed + layer * 1.3);
+                        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                    }
+                    ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
+                    ctx.fillStyle = `rgba(255,255,255,${alpha})`; ctx.fill();
+                }
+
+                ctx.save();
+                for (let i = 0; i < 14; i++) {
+                    const sx = ((i * w / 13) + Math.sin(ts / 1200 + i) * 25 + this.waveOffset * 20) % w;
+                    const sy = waterY + 8 + Math.sin(ts / 800 + i * 1.5) * 22;
+                    ctx.fillStyle = `rgba(255,255,255,${0.06 + 0.1 * Math.sin(ts / 500 + i)})`;
+                    ctx.fillRect(sx, sy, Math.sin(ts / 700 + i) * 28 + 38, 1.5);
+                }
+                ctx.restore();
+
+                ctx.save(); ctx.globalAlpha = 0.055 + 0.03 * Math.sin(ts / 2000);
+                for (let i = 0; i < 6; i++) {
+                    const fx = ((i * w * 0.2) + ts * 0.007 * (i % 2 === 0 ? 1 : -0.7)) % w;
+                    const fy = waterY + 50 + i * 28 + Math.sin(ts / 1600 + i) * 18;
+                    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(fx, fy, 13 + i * 2, 5, 0, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.moveTo(fx - 13, fy); ctx.lineTo(fx - 20, fy - 4); ctx.lineTo(fx - 20, fy + 4); ctx.fill();
+                }
+                ctx.restore();
+
+                this.ripples.forEach(rp => {
+                    ctx.save(); ctx.beginPath(); ctx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(255,255,255,${rp.alpha})`; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore();
                 });
-                ctx.save(); ctx.beginPath(); ctx.arc(w * 0.5, h * 0.16, 5, 0, Math.PI * 2); ctx.fillStyle = 'rgba(200,180,140,0.75)'; ctx.fill(); ctx.restore();
-            }
 
-            this.particles.forEach(p => {
-                ctx.save(); ctx.globalAlpha = Math.max(0, p.life); ctx.fillStyle = p.color || '#7dd3fc';
-                ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-            });
+                this.weatherParticles.forEach(p => {
+                    ctx.save(); ctx.globalAlpha = p.alpha * 0.65;
+                    if (p.sn) { ctx.fillStyle = '#e0f2fe'; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill(); }
+                    else { ctx.strokeStyle = 'rgba(147,197,253,0.8)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + p.vx * 2, p.y + p.vy * 0.55); ctx.stroke(); }
+                    ctx.restore();
+                });
 
-            if ((this.state.upgrades.sonar || 0) > 0 && this.fishingState === 'WAITING' && this.hooks[0]) {
-                const pingR = ((ts % 2000) / 2000) * 85;
-                ctx.save(); ctx.strokeStyle = `rgba(0,176,240,${(1 - pingR / 85) * 0.28})`; ctx.lineWidth = 1.5;
-                ctx.beginPath(); ctx.arc(this.hooks[0].x, this.hooks[0].y, pingR, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
-            }
+                if (this.lightningFlash > 0.25) {
+                    ctx.save(); ctx.globalAlpha = this.lightningFlash * 0.9; ctx.strokeStyle = '#ddd6fe'; ctx.lineWidth = 2;
+                    ctx.shadowBlur = 25; ctx.shadowColor = '#818cf8';
+                    const lx = w * 0.35 + Math.random() * w * 0.3;
+                    ctx.beginPath(); ctx.moveTo(lx, 0);
+                    let cy2 = 0;
+                    while (cy2 < waterY) { cy2 += 15 + Math.random() * 25; ctx.lineTo(lx + (Math.random() - 0.5) * 35, cy2); }
+                    ctx.stroke(); ctx.restore();
+                }
 
-            if (this.fishingState === 'IDLE') {
-                const pulse = 0.5 + Math.sin(ts / 550) * 0.28;
-                ctx.save(); ctx.globalAlpha = pulse; ctx.fillStyle = '#fff'; ctx.font = 'bold 16px Segoe UI';
-                ctx.textAlign = 'center'; ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(0,176,240,0.75)';
-                ctx.fillText('TAP TO CAST', w / 2, waterY + 44); ctx.restore();
-            }
+                if (wd.fogAlpha > 0) {
+                    const fg = ctx.createLinearGradient(0, waterY - 80, 0, waterY + 120);
+                    fg.addColorStop(0, 'rgba(180,200,220,0)'); fg.addColorStop(0.5, `rgba(180,200,220,${wd.fogAlpha})`); fg.addColorStop(1, 'rgba(180,200,220,0)');
+                    ctx.fillStyle = fg; ctx.fillRect(0, waterY - 80, w, 200);
+                }
 
-            if (this.combo >= 2) {
-                ctx.save(); ctx.globalAlpha = 0.82; ctx.fillStyle = '#facc15'; ctx.font = 'bold 13px Segoe UI';
-                ctx.textAlign = 'right'; ctx.fillText('🔥 ' + this.combo + 'x COMBO', w - 12, h - 102); ctx.restore();
-            }
-        }
+                this.yankedFishes.forEach(yf => {
+                    ctx.save(); ctx.translate(yf.x, yf.y); ctx.rotate(yf.rotation);
+                    this.drawFishEntity(ctx, 0, 0, yf.size, yf.fishData, yf.life); ctx.restore();
+                });
 
-        drawFishEntity(ctx, x, y, size, fishData, life = 1) {
-            ctx.save(); ctx.translate(x, y);
-            const rarity = fishData.template ? fishData.template.rarity : fishData.fishRarity;
-            let color = CONFIG.rarities[rarity].color;
-            const muts = fishData.mutations || [];
-            const isGolden = muts.some(m => m.name === 'Golden' || m.name === 'Sunforged');
-            const isGhostly = muts.some(m => ['Ghostly', 'Phantom', 'Spectral', 'Ethereal'].includes(m.name));
-            const isPlump = muts.some(m => ['Plump', 'Pudgy', 'Heavy'].includes(m.name));
-            const isLong = muts.some(m => ['Long', 'Sleek'].includes(m.name));
-            const isSpiky = muts.some(m => ['Spiky', 'Savage', 'Vicious'].includes(m.name));
-            const isCrystalline = muts.some(m => ['Crystalline', 'Diamond'].includes(m.name));
-            const isElectric = muts.some(m => ['Electric', 'Neon', 'Radioactive'].includes(m.name));
-            const isGiant = muts.some(m => m.name === 'Giant');
-            const isInfernal = muts.some(m => ['Infernal', 'Charred', 'Bloodsoaked'].includes(m.name));
-            const isCelestial = muts.some(m => ['Celestial', 'Astral', 'Starborn'].includes(m.name));
-            if (isGolden) color = '#fbbf24';
-            if (isCrystalline) color = '#a5f3fc';
-            if (isInfernal) color = '#ef4444';
-            if (isCelestial) color = '#e0e7ff';
-            let hmc = null, hmi = -1;
-            muts.forEach(m => { const d = MUTATION_CLASSES[m.class]; if (d && d.id > hmi) { hmi = d.id; hmc = d.color; } });
-            if (hmc) { ctx.shadowBlur = 22; ctx.shadowColor = hmc; }
-            if (isElectric) { ctx.shadowBlur = 26; ctx.shadowColor = '#a78bfa'; }
-            if (isCelestial) { ctx.shadowBlur = 30; ctx.shadowColor = '#818cf8'; }
-            ctx.globalAlpha = isGhostly ? 0.36 * Math.max(0, life) : Math.max(0, life);
-            let bw = size * (isGiant ? 1.55 : 1), bh = size * 0.58;
-            if (isPlump) bh *= 1.5; if (isLong) bw *= 1.55;
-            ctx.fillStyle = color;
-            ctx.beginPath(); ctx.moveTo(-bw * 0.44, 0); ctx.lineTo(-bw * 1.6, -bh * 0.9); ctx.lineTo(-bw * 1.6, bh * 0.9); ctx.fill();
-            if (isSpiky) {
-                ctx.fillStyle = hmc || color;
-                for (let i = -bw * 0.5; i < bw * 0.5; i += bw * 0.35) {
-                    ctx.beginPath(); ctx.moveTo(i, -bh * 0.5); ctx.lineTo(i + bw * 0.17, -bh * 1.65); ctx.lineTo(i + bw * 0.34, -bh * 0.5); ctx.fill();
+                if (this.fishingState !== 'IDLE' && this.hooks && this.hooks.length) {
+                    const rodTipX = w * 0.5, rodTipY = h * 0.16;
+                    this.hooks.forEach(hook => {
+                        if (hook.state === 'ESCAPED') return;
+                        const bx = hook.x;
+                        const by = hook.y + (hook.state === 'WAITING' || hook.state === 'BITE' ? hook.offset + hook.bobble : 0);
+                        ctx.beginPath();
+                        const cx2 = (rodTipX + bx) / 2 + Math.sin(ts / 900) * 18;
+                        const cy2 = rodTipY + (by - rodTipY) * 0.35 - 25;
+                        ctx.moveTo(rodTipX, rodTipY); ctx.quadraticCurveTo(cx2, cy2, bx, by);
+                        ctx.strokeStyle = `rgba(220,218,210,${hook.state === 'BITE' ? 0.9 : 0.5})`; ctx.lineWidth = 1.5; ctx.stroke();
+                        const biting = hook.state === 'BITE';
+                        ctx.save(); ctx.translate(bx, by);
+                        if (biting) ctx.rotate(Math.sin(ts / 75) * 0.35);
+                        if (biting) { ctx.shadowBlur = 18; ctx.shadowColor = '#ef4444'; }
+                        else { ctx.shadowBlur = 8; ctx.shadowColor = '#60a5fa'; }
+                        ctx.fillStyle = biting ? '#ef4444' : '#f0ede8';
+                        ctx.beginPath(); ctx.ellipse(0, 0, 9, 4.5, 0, 0, Math.PI * 2); ctx.fill();
+                        ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.beginPath(); ctx.ellipse(-1, -1.5, 4, 2, 0.4, 0, Math.PI * 2); ctx.fill();
+                        ctx.fillStyle = biting ? '#fca5a5' : '#93c5fd';
+                        ctx.beginPath(); ctx.moveTo(-9, 0); ctx.lineTo(-15, -5); ctx.lineTo(-15, 5); ctx.closePath(); ctx.fill();
+                        ctx.shadowBlur = 0; ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1.5;
+                        ctx.beginPath(); ctx.moveTo(5, 4.5); ctx.lineTo(5, 11); ctx.quadraticCurveTo(5, 16, 0, 16); ctx.stroke();
+                        if (biting) {
+                            const ring = Math.sin(ts / 80) * 0.5 + 0.5;
+                            ctx.strokeStyle = `rgba(239,68,68,${ring})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 18 + ring * 10, 0, Math.PI * 2); ctx.stroke();
+                            ctx.strokeStyle = `rgba(239,68,68,${ring * 0.4})`; ctx.beginPath(); ctx.arc(0, 0, 30 + ring * 10, 0, Math.PI * 2); ctx.stroke();
+                        }
+                        ctx.restore();
+                    });
+                    ctx.save(); ctx.beginPath(); ctx.arc(w * 0.5, h * 0.16, 5, 0, Math.PI * 2); ctx.fillStyle = 'rgba(200,180,140,0.75)'; ctx.fill(); ctx.restore();
+                }
+
+                this.particles.forEach(p => {
+                    ctx.save(); ctx.globalAlpha = Math.max(0, p.life); ctx.fillStyle = p.color || '#7dd3fc';
+                    ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+                });
+
+                if ((this.state.upgrades.sonar || 0) > 0 && this.fishingState === 'WAITING' && this.hooks[0]) {
+                    const pingR = ((ts % 2000) / 2000) * 85;
+                    ctx.save(); ctx.strokeStyle = `rgba(0,176,240,${(1 - pingR / 85) * 0.28})`; ctx.lineWidth = 1.5;
+                    ctx.beginPath(); ctx.arc(this.hooks[0].x, this.hooks[0].y, pingR, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+                }
+
+                if (this.fishingState === 'IDLE') {
+                    const pulse = 0.5 + Math.sin(ts / 550) * 0.28;
+                    ctx.save(); ctx.globalAlpha = pulse; ctx.fillStyle = '#fff'; ctx.font = 'bold 16px Segoe UI';
+                    ctx.textAlign = 'center'; ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(0,176,240,0.75)';
+                    ctx.fillText('TAP TO CAST', w / 2, waterY + 44); ctx.restore();
+                }
+
+                if (this.combo >= 2) {
+                    ctx.save(); ctx.globalAlpha = 0.82; ctx.fillStyle = '#facc15'; ctx.font = 'bold 13px Segoe UI';
+                    ctx.textAlign = 'right'; ctx.fillText('🔥 ' + this.combo + 'x COMBO', w - 12, h - 102); ctx.restore();
                 }
             }
-            if (isCrystalline) {
-                ctx.fillStyle = color; ctx.globalAlpha *= 0.75;
-                ctx.beginPath(); ctx.moveTo(-bw, 0); ctx.lineTo(-bw * 0.3, -bh); ctx.lineTo(bw, 0); ctx.lineTo(-bw * 0.3, bh); ctx.closePath(); ctx.fill();
-                ctx.fillStyle = 'rgba(255,255,255,0.28)'; ctx.beginPath(); ctx.moveTo(-bw * 0.3, -bh); ctx.lineTo(bw, 0); ctx.lineTo(-bw * 0.1, 0); ctx.closePath(); ctx.fill();
-            } else {
-                ctx.fillStyle = color; ctx.beginPath(); ctx.ellipse(0, 0, bw, bh, 0, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = 'rgba(255,255,255,0.16)'; ctx.beginPath(); ctx.ellipse(bw * 0.1, bh * 0.22, bw * 0.5, bh * 0.38, 0, 0, Math.PI * 2); ctx.fill();
+
+            drawFishEntity(ctx, x, y, size, fishData, life = 1) {
+                ctx.save(); ctx.translate(x, y);
+                const rarity = fishData.template ? fishData.template.rarity : fishData.fishRarity;
+                let color = CONFIG.rarities[rarity].color;
+                const muts = fishData.mutations || [];
+                const isGolden = muts.some(m => m.name === 'Golden' || m.name === 'Sunforged');
+                const isGhostly = muts.some(m => ['Ghostly', 'Phantom', 'Spectral', 'Ethereal'].includes(m.name));
+                const isPlump = muts.some(m => ['Plump', 'Pudgy', 'Heavy'].includes(m.name));
+                const isLong = muts.some(m => ['Long', 'Sleek'].includes(m.name));
+                const isSpiky = muts.some(m => ['Spiky', 'Savage', 'Vicious'].includes(m.name));
+                const isCrystalline = muts.some(m => ['Crystalline', 'Diamond'].includes(m.name));
+                const isElectric = muts.some(m => ['Electric', 'Neon', 'Radioactive'].includes(m.name));
+                const isGiant = muts.some(m => m.name === 'Giant');
+                const isInfernal = muts.some(m => ['Infernal', 'Charred', 'Bloodsoaked'].includes(m.name));
+                const isCelestial = muts.some(m => ['Celestial', 'Astral', 'Starborn'].includes(m.name));
+                if (isGolden) color = '#fbbf24';
+                if (isCrystalline) color = '#a5f3fc';
+                if (isInfernal) color = '#ef4444';
+                if (isCelestial) color = '#e0e7ff';
+                let hmc = null, hmi = -1;
+                muts.forEach(m => { const d = MUTATION_CLASSES[m.class]; if (d && d.id > hmi) { hmi = d.id; hmc = d.color; } });
+                if (hmc) { ctx.shadowBlur = 22; ctx.shadowColor = hmc; }
+                if (isElectric) { ctx.shadowBlur = 26; ctx.shadowColor = '#a78bfa'; }
+                if (isCelestial) { ctx.shadowBlur = 30; ctx.shadowColor = '#818cf8'; }
+                ctx.globalAlpha = isGhostly ? 0.36 * Math.max(0, life) : Math.max(0, life);
+                let bw = size * (isGiant ? 1.55 : 1), bh = size * 0.58;
+                if (isPlump) bh *= 1.5; if (isLong) bw *= 1.55;
+                ctx.fillStyle = color;
+                ctx.beginPath(); ctx.moveTo(-bw * 0.44, 0); ctx.lineTo(-bw * 1.6, -bh * 0.9); ctx.lineTo(-bw * 1.6, bh * 0.9); ctx.fill();
+                if (isSpiky) {
+                    ctx.fillStyle = hmc || color;
+                    for (let i = -bw * 0.5; i < bw * 0.5; i += bw * 0.35) {
+                        ctx.beginPath(); ctx.moveTo(i, -bh * 0.5); ctx.lineTo(i + bw * 0.17, -bh * 1.65); ctx.lineTo(i + bw * 0.34, -bh * 0.5); ctx.fill();
+                    }
+                }
+                if (isCrystalline) {
+                    ctx.fillStyle = color; ctx.globalAlpha *= 0.75;
+                    ctx.beginPath(); ctx.moveTo(-bw, 0); ctx.lineTo(-bw * 0.3, -bh); ctx.lineTo(bw, 0); ctx.lineTo(-bw * 0.3, bh); ctx.closePath(); ctx.fill();
+                    ctx.fillStyle = 'rgba(255,255,255,0.28)'; ctx.beginPath(); ctx.moveTo(-bw * 0.3, -bh); ctx.lineTo(bw, 0); ctx.lineTo(-bw * 0.1, 0); ctx.closePath(); ctx.fill();
+                } else {
+                    ctx.fillStyle = color; ctx.beginPath(); ctx.ellipse(0, 0, bw, bh, 0, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = 'rgba(255,255,255,0.16)'; ctx.beginPath(); ctx.ellipse(bw * 0.1, bh * 0.22, bw * 0.5, bh * 0.38, 0, 0, Math.PI * 2); ctx.fill();
+                }
+                ctx.fillStyle = hmc ? hmc + '99' : color + '99';
+                ctx.beginPath(); ctx.moveTo(0, -bh * 0.95); ctx.lineTo(bw * 0.28, -bh * 1.65); ctx.lineTo(bw * 0.56, -bh * 0.95); ctx.fill();
+                if (isElectric) {
+                    ctx.strokeStyle = 'rgba(196,181,253,0.7)'; ctx.lineWidth = 1.5;
+                    for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.moveTo(-bw * 0.5 + i * bw * 0.38, -bh * 0.5); ctx.lineTo(-bw * 0.3 + i * bw * 0.38 + 9, 0); ctx.lineTo(-bw * 0.1 + i * bw * 0.38, bh * 0.5); ctx.stroke(); }
+                }
+                if (isCelestial) {
+                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                    for (let i = 0; i < 4; i++) { const ang = i * Math.PI / 2; ctx.beginPath(); ctx.arc(Math.cos(ang) * bw * 0.5, Math.sin(ang) * bh * 0.5, 2, 0, Math.PI * 2); ctx.fill(); }
+                }
+                ctx.shadowBlur = 0; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(bw * 0.42, -bh * 0.22, size * 0.14, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#0a0a0a'; ctx.beginPath(); ctx.arc(bw * 0.46, -bh * 0.22, size * 0.08, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
             }
-            ctx.fillStyle = hmc ? hmc + '99' : color + '99';
-            ctx.beginPath(); ctx.moveTo(0, -bh * 0.95); ctx.lineTo(bw * 0.28, -bh * 1.65); ctx.lineTo(bw * 0.56, -bh * 0.95); ctx.fill();
-            if (isElectric) {
-                ctx.strokeStyle = 'rgba(196,181,253,0.7)'; ctx.lineWidth = 1.5;
-                for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.moveTo(-bw * 0.5 + i * bw * 0.38, -bh * 0.5); ctx.lineTo(-bw * 0.3 + i * bw * 0.38 + 9, 0); ctx.lineTo(-bw * 0.1 + i * bw * 0.38, bh * 0.5); ctx.stroke(); }
-            }
-            if (isCelestial) {
-                ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                for (let i = 0; i < 4; i++) { const ang = i * Math.PI / 2; ctx.beginPath(); ctx.arc(Math.cos(ang) * bw * 0.5, Math.sin(ang) * bh * 0.5, 2, 0, Math.PI * 2); ctx.fill(); }
-            }
-            ctx.shadowBlur = 0; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(bw * 0.42, -bh * 0.22, size * 0.14, 0, Math.PI * 2); ctx.fill();
-            ctx.fillStyle = '#0a0a0a'; ctx.beginPath(); ctx.arc(bw * 0.46, -bh * 0.22, size * 0.08, 0, Math.PI * 2); ctx.fill();
-            ctx.restore();
         }
-    }
 
         // ============================================================
         //  GLOBAL STATE MANAGER & INIT
@@ -3584,6 +3590,19 @@
             stateManager._handleSlotDelete = (slotName) => {
                 stateManager.states.saveSelect._handleSlotDelete(slotName);
             };
+        });
+        // Make sure gameCore is always accessible
+        Object.defineProperty(window, 'gameCore', {
+            get: function () {
+                if (stateManager.current && stateManager.current.isGame && stateManager.current.game) {
+                    return stateManager.current.game;
+                }
+                return null;
+            },
+            set: function (value) {
+                // Allow setting for backward compatibility
+                window._gameCore = value;
+            }
         });
     </script>
 </body>
