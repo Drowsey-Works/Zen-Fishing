@@ -2472,9 +2472,10 @@
                 const spacing = 50, startX = (this.canvas.width / 2) - ((rod.hooks - 1) * spacing / 2);
                 for (let i = 0; i < rod.hooks; i++) {
                     // Slower bite timers for better pacing
-                    let bt = (4500 + Math.random() * 7000) / (1 + this.state.upgrades.reel * 0.18);
+                    // Slower bite timers with linear scaling
+                    let bt = (4500 + Math.random() * 7000) / (1 + (this.state.upgrades.reel * 0.12));
                     bt /= wd.biteSpeedMult;
-                    if (this.state.upgrades.sonar > 0) bt *= Math.max(0.5, 1 - this.state.upgrades.sonar * 0.08);
+                    if (this.state.upgrades.sonar > 0) bt *= Math.max(0.4, 1 - this.state.upgrades.sonar * 0.06);
                     this.hooks.push({
                         state: 'CASTING',
                         x: startX + (i * spacing) + (Math.random() * 30 - 15), y: -50,
@@ -2513,7 +2514,8 @@
 
                 // Calculate luck with caps
                 // Calculate luck with level-based diminishing returns
-                const baseLuck = rod.luckBonus + (this.state.upgrades.luck * 2) + wd.rareLuck + (this.state.upgrades.depth * 1.5);
+                const baseLuck = rod.luckBonus + (this.state.upgrades.luck * 2) + wd.rareLuck + (this.state.upgrades.depth * 1.2);
+
                 // Reduce luck for low levels
                 const levelPenalty = Math.max(0, 1 - (this.state.level / 30));
                 const cappedLuck = Math.min(40, baseLuck * (1 - levelPenalty * 0.5));
@@ -2596,7 +2598,7 @@
                 // Slower progression for better pacing
                 this.miniGame.maxProgress = 100 + (diff * 22);
                 this.miniGame.progress = this.miniGame.maxProgress * 0.18;
-                this.miniGame.drainRate = Math.max(0.9, (diff * 4.2) - (ll * 0.7));
+                this.miniGame.drainRate = Math.max(0.7, (diff * 3.8) - (ll * 0.5));
                 this.miniGame.freezeTimer = 0;
                 this.miniGame.zenTimer = 2.8;
 
@@ -2936,30 +2938,41 @@
                 document.getElementById('rods-list').innerHTML = rh;
 
                 // SKILLS - with better cost scaling
+                // SKILLS - with balanced cost scaling
+                // SKILLS - Infinite scaling with diminishing returns
                 const UPGS = [
-                    { id: 'line', name: 'Braided Line', desc: 'Widens catch zone (+8% per level)', icon: 'fa-solid fa-rope', base: 80, maxLevel: 12, benefit: 8 },
-                    { id: 'reel', name: 'High-Speed Reel', desc: 'Fish bite 12% faster per level', icon: 'fa-solid fa-gear', base: 100, maxLevel: 10, benefit: 12 },
-                    { id: 'luck', name: 'Shiny Lure', desc: '+3% rare luck per level', icon: 'fa-solid fa-star', base: 150, maxLevel: 20, benefit: 3 },
-                    { id: 'auto', name: 'Fishing Net', desc: '$5/sec passive income per level', icon: 'fa-solid fa-fish-fins', base: 800, maxLevel: 10, benefit: 5 },
-                    { id: 'depth', name: 'Deep-Sea Sonar', desc: '+2% rare luck & bigger fish', icon: 'fa-solid fa-satellite-dish', base: 400, maxLevel: 15, benefit: 2 },
-                    { id: 'sonar', name: 'Bite Sensor', desc: 'Reduces wait time by 15% per level', icon: 'fa-solid fa-wifi', base: 600, maxLevel: 8, benefit: 15 },
-                    { id: 'stormgear', name: 'Storm Gear', desc: '+10% bite window in bad weather', icon: 'fa-solid fa-shield', base: 500, maxLevel: 10, benefit: 10 },
-                    { id: 'magnetism', name: 'Value Magnetism', desc: '+4% sell value per level', icon: 'fa-solid fa-magnet', base: 1200, maxLevel: 15, benefit: 4 },
-                    { id: 'netweave', name: 'Net Weave', desc: 'Auto-fisher catches 20% rarer fish', icon: 'fa-solid fa-network-wired', base: 3000, maxLevel: 8, benefit: 20 },
-                    { id: 'stabilizer', name: 'Cursor Stabilizer', desc: 'Slows cursor speed by 12% per level', icon: 'fa-solid fa-gauge-high', base: 250, maxLevel: 12, benefit: 12 }
+                    { id: 'line', name: 'Braided Line', desc: 'Widens catch zone', icon: 'fa-solid fa-rope', base: 80, benefit: 5 },
+                    { id: 'reel', name: 'High-Speed Reel', desc: 'Fish bite faster', icon: 'fa-solid fa-gear', base: 100, benefit: 7 },
+                    { id: 'luck', name: 'Shiny Lure', desc: '+1.5% rare luck', icon: 'fa-solid fa-star', base: 120, benefit: 1.5 },
+                    { id: 'auto', name: 'Fishing Net', desc: '$2.5/sec passive income', icon: 'fa-solid fa-fish-fins', base: 500, benefit: 2.5 },
+                    { id: 'depth', name: 'Deep-Sea Sonar', desc: '+1% rare luck & bigger fish', icon: 'fa-solid fa-satellite-dish', base: 350, benefit: 1 },
+                    { id: 'sonar', name: 'Bite Sensor', desc: 'Reduces wait time', icon: 'fa-solid fa-wifi', base: 450, benefit: 8 },
+                    { id: 'stormgear', name: 'Storm Gear', desc: '+6% bite window in bad weather', icon: 'fa-solid fa-shield', base: 400, benefit: 6 },
+                    { id: 'magnetism', name: 'Value Magnetism', desc: '+2.5% sell value', icon: 'fa-solid fa-magnet', base: 800, benefit: 2.5 },
+                    { id: 'netweave', name: 'Net Weave', desc: 'Auto-fisher catches 12% rarer fish', icon: 'fa-solid fa-network-wired', base: 2000, benefit: 12 },
+                    { id: 'stabilizer', name: 'Cursor Stabilizer', desc: 'Slows cursor speed by 6%', icon: 'fa-solid fa-gauge-high', base: 200, benefit: 6 }
                 ];
+
                 let uh = '';
                 UPGS.forEach(u => {
                     const lv = this.state.upgrades[u.id] || 0;
-                    const cost = u.maxLevel && lv >= u.maxLevel ? 999999999 : Math.floor(u.base * Math.pow(1.55, lv));
-                    const isMaxed = u.maxLevel && lv >= u.maxLevel;
+                    // Cost: base + (level * base * 0.3) - slowly increasing
+                    const cost = Math.floor(u.base + (lv * u.base * 0.3));
+                    const benefitValue = (u.benefit * lv).toFixed(1);
+
                     uh += `<div class="upgrade-item">
-                        <div class="item-header"><i class="${u.icon}"></i> &nbsp;${u.name} <span style="color:#00b0f0;font-size:0.8rem;font-weight:normal">Lv.${lv}${isMaxed ? ' [MAX]' : ''}</span></div>
-                        <div class="item-stats">${u.desc}${u.maxLevel ? `<br><span style="color:#666">Max: ${u.maxLevel}</span>` : ''}</div>
-                        ${isMaxed ? `<button class="btn-equipped" disabled><i class="fa-solid fa-check"></i> Maxed</button>`
-                            : `<button class="btn-buy" ${this.state.money < cost ? 'disabled' : ''} onclick="gameCore.buyUpgrade('${u.id}',${cost})">
-                            <i class="fa-solid fa-arrow-up"></i> Upgrade — $${cost.toLocaleString()}</button>`}
-                    </div>`;
+        <div class="item-header"><i class="${u.icon}"></i> &nbsp;${u.name} 
+            <span style="color:#00b0f0;font-size:0.8rem;font-weight:normal">Lv.${lv}</span>
+        </div>
+        <div class="item-stats">
+            ${u.desc}: +${benefitValue}${u.benefit === 1.5 ? '%' : (u.benefit < 10 ? '%' : '')}
+            <br><span style="color:#666">Next upgrade: $${cost.toLocaleString()}</span>
+            <br><span style="color:#555">Total bonus: +${benefitValue}</span>
+        </div>
+        <button class="btn-buy" ${this.state.money < cost ? 'disabled' : ''} onclick="gameCore.buyUpgrade('${u.id}',${cost})">
+            <i class="fa-solid fa-arrow-up"></i> Upgrade to Lv.${lv + 1} — $${cost.toLocaleString()}
+        </button>
+    </div>`;
                 });
                 document.getElementById('upgrades-list').innerHTML = uh;
 
@@ -3072,13 +3085,7 @@
             }
 
             buyUpgrade(id, cost) {
-                const UPGS = {
-                    line: { maxLevel: 10 }, reel: { maxLevel: 10 }, luck: { maxLevel: 15 },
-                    auto: { maxLevel: 8 }, depth: { maxLevel: 12 }, sonar: { maxLevel: 10 },
-                    stormgear: { maxLevel: 10 }, magnetism: { maxLevel: 12 }, netweave: { maxLevel: 8 }, stabilizer: { maxLevel: 10 }
-                };
                 const lv = this.state.upgrades[id] || 0;
-                if (UPGS[id] && lv >= UPGS[id].maxLevel) return;
 
                 if (this.state.money >= cost) {
                     this.state.money -= cost;
@@ -3086,8 +3093,17 @@
                     this.state.upgrades[id]++;
                     this.updateUI();
                     this.renderShop();
-                    this.log('Upgraded!', '#4ade80');
+
+                    // Show total bonus after upgrade
+                    const UPGS = {
+                        line: 5, reel: 7, luck: 1.5, auto: 2.5, depth: 1,
+                        sonar: 8, stormgear: 6, magnetism: 2.5, netweave: 12, stabilizer: 6
+                    };
+                    const totalBonus = (UPGS[id] * this.state.upgrades[id]).toFixed(1);
+                    this.log(`${id} upgraded to level ${this.state.upgrades[id]}! Total bonus: +${totalBonus}${UPGS[id] < 10 ? '%' : ''}`, '#4ade80');
                     this.autoSave();
+                } else {
+                    this.log(`Not enough money! Need $${cost.toLocaleString()}`, '#f87171');
                 }
             }
 
