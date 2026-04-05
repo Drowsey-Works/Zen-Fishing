@@ -2716,7 +2716,6 @@
                 this.state.money += tot;
 
                 // Level up every 10 fish caught (more consistent pacing)
-                if (this.state.totalCaught % 10 === 0) this.levelUp();
 
                 if (this.combo >= 3) this.showComboPopup(this.combo + 'x COMBO!', '#facc15');
                 if (this.activeFishes.length > 1) this.createNotif('MULTI! ×' + this.activeFishes.length, this.canvas.width / 2, this.canvas.height / 2 + 50, "#38bdf8");
@@ -2752,7 +2751,7 @@
             addXP(a) {
                 // More balanced XP curve - scales properly with level
                 const areaMult = Math.min(1.5, 1 / (CONFIG.areas[this.state.currentArea].diffMult || 1));
-                const levelFactor = Math.max(0.5, 1 - (this.state.level * 0.008));
+                const levelFactor = 1 / (1 + this.state.level * 0.02);
                 const scaledXP = Math.floor(a * areaMult * levelFactor);
 
                 this.state.xp += scaledXP;
@@ -3697,4 +3696,5 @@
 </body>
 
 </html>
+
 
