@@ -2990,8 +2990,8 @@
         </div>
         <div class="item-stats">${b.desc}<br><span style="color:#facc15">$${b.cost} each</span></div>
         <div style="display:flex;gap:8px">
-            <button class="btn-buy" ${!aff ? 'disabled' : ''} onclick="gameCore.buyBait('${name}')" style="flex:2">
-                <i class="fa-solid fa-cart-shopping"></i> Buy (x5) — $${(b.cost * 5).toLocaleString()}
+            <button class="btn-buy" ${!aff ? 'disabled' : ''} onclick="gameCore.buyBait('${name}', 1)" style="flex:2">
+                <i class="fa-solid fa-cart-shopping"></i> Buy (x1) — $${b.cost.toLocaleString()}
             </button>
             ${inventory > 0 && !active ?
                             `<button class="btn-equip" onclick="gameCore.equipBait('${name}')" style="flex:1">Equip</button>` :
@@ -3107,17 +3107,28 @@
                 }
             }
 
-            buyBait(name) {
+            buyBait(name, amount = 1) {
                 const b = BAITS[name];
-                const stackSize = 999999; // Can buy up to 5 at once
+                const MAX_STACK = 999999;
 
-                if (this.state.money >= b.cost * stackSize) {
-                    const buyAmount = Math.min(stackSize, Math.floor(this.state.money / b.cost));
-                    this.state.money -= b.cost * buyAmount;
-                    this.state.baitInventory[name] = (this.state.baitInventory[name] || 0) + buyAmount;
-                    this.autoSave();
+                const current = this.state.baitInventory[name] || 0;
 
-                    // Auto-equip if no bait active
+                // Prevent exceeding max stack
+                if (current >= MAX_STACK) {
+                    this.log(`${name} is already at max stack!`, '#f87171');
+                    return;
+                }
+
+                // Clamp amount so it doesn't exceed max
+                const allowedAmount = Math.min(amount, MAX_STACK - current);
+
+                const totalCost = b.cost * allowedAmount;
+
+                if (this.state.money >= totalCost) {
+                    this.state.money -= totalCost;
+                    this.state.baitInventory[name] = current + allowedAmount;
+
+                    // Auto-equip if none active
                     if (!this.state.activeBait) {
                         this.state.activeBait = name;
                         this.state.baitUses = this.state.baitInventory[name];
@@ -3125,7 +3136,11 @@
 
                     this.updateUI();
                     this.renderShop();
-                    this.log(`Bought ${buyAmount}x ${name}!`, '#4ade80');
+                    this.autoSave();
+
+                    this.log(`Bought ${allowedAmount}x ${name}!`, '#4ade80');
+                } else {
+                    this.log(`Not enough money! Need $${totalCost.toLocaleString()}`, '#f87171');
                 }
             }
 
@@ -3682,3 +3697,4 @@
 </body>
 
 </html>
+
