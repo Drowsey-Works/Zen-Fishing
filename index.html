@@ -2755,17 +2755,28 @@
                 const scaledXP = Math.floor(a * areaMult * levelFactor);
 
                 this.state.xp += scaledXP;
-                // Slower XP requirement growth
-                const needed = Math.floor(100 + (this.state.level * 15) + Math.pow(this.state.level, 1.5) * 5);
 
-                while (this.state.xp >= needed && this.state.level < 200) {
-                    this.state.xp -= needed;
-                    this.levelUp();
+                // Loop until all possible level-ups are processed
+                let leveledUp = false;
+                while (this.state.level < 200) {
+                    // Recalculate needed XP for current level each time
+                    const needed = Math.floor(100 + (this.state.level * 15) + Math.pow(this.state.level, 1.5) * 5);
+
+                    if (this.state.xp >= needed) {
+                        this.state.xp -= needed;
+                        this.levelUp();
+                        leveledUp = true;
+                    } else {
+                        break;
+                    }
                 }
 
-                const pct = Math.min(100, (this.state.xp / needed) * 100);
+                // Update XP bar with current level's requirement
+                const currentNeeded = Math.floor(100 + (this.state.level * 15) + Math.pow(this.state.level, 1.5) * 5);
+                const pct = Math.min(100, (this.state.xp / currentNeeded) * 100);
                 document.getElementById('xp-bar-fill').style.width = pct + '%';
             }
+
 
             levelUp() {
                 this.state.level++;
@@ -3696,3 +3707,4 @@
 </body>
 
 </html>
+
