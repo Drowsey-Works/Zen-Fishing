@@ -2987,7 +2987,7 @@
                 let levelsGained = 0;
                 let totalXPNeeded = 0;
 
-                while (this.state.level < 99999) {
+                while (this.state.level < Number.MAX_SAFE_INTIGER) {
                     const needed = Math.floor(80 * (1 + Math.pow(this.state.level, 0.7)));
                     totalXPNeeded = needed;
 
