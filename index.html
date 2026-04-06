@@ -367,18 +367,20 @@
             top: 62px;
             left: 8px;
             right: 8px;
-            height: 6px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 4px;
+            height: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
             z-index: 44;
-            overflow: hidden
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         #xp-bar-fill {
             height: 100%;
-            background: linear-gradient(90deg, #7c3aed, #00b0f0);
-            border-radius: 4px;
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1)
+            background: linear-gradient(90deg, #7c3aed, #00b0f0, #38bdf8);
+            border-radius: 8px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 6px rgba(0, 176, 240, 0.5);
         }
 
         #level-badge {
@@ -1509,6 +1511,9 @@
         </div>
         <div id="xp-bar-wrap" style="display:none">
             <div id="xp-bar-fill" style="width:0%"></div>
+            <div id="xp-text"
+                style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:9px; font-weight:800; color:white; text-shadow:0 0 3px black; white-space:nowrap; pointer-events:none; z-index:45;">
+                0 / 0 XP</div>
         </div>
         <div id="level-badge" style="display:none"><i class="fa-solid fa-star"></i> Lv.<span
                 id="level-badge-value">1</span></div>
@@ -2314,6 +2319,152 @@
                 this.animFrame = null;
             }
 
+            async animateXPBar(targetXP, targetLevel, startXP = null, startLevel = null) {
+                // Store original values
+                let currentXP = startXP !== null ? startXP : this.state.xp;
+                let currentLevel = startLevel !== null ? startLevel : this.state.level;
+
+                // Get the XP bar elements
+                const xpFill = document.getElementById('xp-bar-fill');
+                const xpText = document.getElementById('xp-text');
+                if (xpText) {
+                    xpText.innerHTML = `${Math.floor(this.state.xp).toLocaleString()} / ${nextNeeded.toLocaleString()} XP`;
+                } const levelBadge = document.getElementById('level-badge-value');
+
+                // Calculate how many level-ups we need to show
+                let levelsToShow = targetLevel - currentLevel;
+
+                // If no level-ups, just animate to the new XP
+                if (levelsToShow <= 0) {
+                    const currentNeeded = Math.floor(80 * (1 + Math.pow(currentLevel, 0.7)));
+                    const targetPct = Math.min(100, (targetXP / currentNeeded) * 100);
+                    await this.animateBarValue(targetPct, 300);
+
+                    if (xpText) {
+                        xpText.innerHTML = `${Math.floor(targetXP).toLocaleString()} / ${currentNeeded.toLocaleString()} XP`;
+                    }
+                    return;
+                }
+
+                // Animate each level-up ONE AT A TIME
+                for (let i = 0; i < levelsToShow; i++) {
+                    const neededForThisLevel = Math.floor(80 * (1 + Math.pow(currentLevel, 0.7)));
+
+                    // STEP 1: Animate from current XP to 100%
+                    const startPct = (currentXP / neededForThisLevel) * 100;
+                    await this.animateBarValue(100, 250, startPct);
+
+                    // STEP 2: Brief pause at 100% (satisfying)
+                    await this.sleep(120);
+
+                    // STEP 3: Level up visual effects
+                    if (levelBadge) {
+                        levelBadge.style.transform = 'scale(1.3)';
+                        levelBadge.style.color = '#facc15';
+                        setTimeout(() => {
+                            if (levelBadge) {
+                                levelBadge.style.transform = 'scale(1)';
+                                levelBadge.style.color = '';
+                            }
+                        }, 200);
+                    }
+
+                    // Show level up text
+                    this.createNotif(`LEVEL ${currentLevel + 1}!`, this.canvas.width / 2, this.canvas.height / 3, "#facc15");
+
+                    // STEP 4: Update level
+                    currentLevel++;
+
+                    // STEP 5: Reset bar to 0% (quick but visible)
+                    await this.animateBarValue(0, 80);
+
+                    // STEP 6: Update display text
+                    // STEP 6: Update display text
+                    const newNeeded = Math.floor(80 * (1 + Math.pow(currentLevel, 0.7)));
+                    if (xpText) {
+                        xpText.innerHTML = `0 / ${newNeeded.toLocaleString()} XP`;
+                        // Also update the level badge tooltip
+                        const levelBadge = document.getElementById('level-badge');
+                        if (levelBadge) {
+                            levelBadge.title = `0 / ${newNeeded.toLocaleString()} XP to level ${currentLevel + 1}`;
+                        }
+                    }
+                    if (levelBadge) {
+                        levelBadge.innerText = currentLevel;
+                    }
+
+                    // STEP 7: Calculate leftover XP for next iteration
+                    // Each level consumes exactly "neededForThisLevel" XP
+                    currentXP = targetXP - (levelsToShow - i - 1) * neededForThisLevel;
+                    if (currentXP < 0) currentXP = 0;
+                }
+
+                // FINAL STEP: Animate to the final XP percentage for the current level
+                if (currentLevel === targetLevel) {
+                    const finalNeeded = Math.floor(80 * (1 + Math.pow(currentLevel, 0.7)));
+                    const finalPct = Math.min(100, (targetXP / finalNeeded) * 100);
+
+                    // Only animate if there's XP to show
+                    if (finalPct > 0) {
+                        await this.animateBarValue(finalPct, 300);
+                    }
+
+                    // Update final text
+                    if (xpText) {
+                        xpText.innerHTML = `${Math.floor(targetXP).toLocaleString()} / ${finalNeeded.toLocaleString()} XP`;
+                        // Flash gold
+                        xpText.style.color = '#facc15';
+                        setTimeout(() => { if (xpText) xpText.style.color = 'white'; }, 400);
+                    }
+
+                }
+            }
+
+            animateBarValue(targetPercent, duration, startPercent = null) {
+                return new Promise((resolve) => {
+                    const xpFill = document.getElementById('xp-bar-fill');
+                    if (!xpFill) {
+                        resolve();
+                        return;
+                    }
+
+                    // Get current width as percentage
+                    let currentPercent = startPercent;
+                    if (currentPercent === null) {
+                        const currentWidth = xpFill.style.width;
+                        currentPercent = parseFloat(currentWidth) || 0;
+                    }
+
+                    const startTime = performance.now();
+                    const startPct = currentPercent;
+                    const endPct = Math.min(100, Math.max(0, targetPercent));
+
+                    const animate = (currentTime) => {
+                        const elapsed = currentTime - startTime;
+                        let progress = Math.min(1, elapsed / duration);
+                        const easeOut = 1 - Math.pow(1 - progress, 3);
+
+                        const newPercent = startPct + (endPct - startPct) * easeOut;
+                        xpFill.style.width = newPercent + '%';
+
+                        if (progress < 1) {
+                            requestAnimationFrame(animate);
+                        } else {
+                            xpFill.style.width = endPct + '%';
+                            resolve();
+                        }
+                    };
+
+                    requestAnimationFrame(animate);
+                });
+            }
+
+            sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+
+
             loadState(data) {
                 this.state = data;
                 // Ensure balance flags exist
@@ -2332,7 +2483,19 @@
                         "Void Fragment": 0
                     };
                 }
+
+                // FORCE XP TEXT UPDATE ON LOAD
+                setTimeout(() => {
+                    const nextNeeded = Math.floor(80 * (1 + Math.pow(this.state.level, 0.7)));
+                    const xpText = document.getElementById('xp-text');
+                    if (xpText) {
+                        xpText.innerHTML = `${Math.floor(this.state.xp).toLocaleString()} / ${nextNeeded.toLocaleString()} XP`;
+                    }
+                    const pct = Math.min(100, (this.state.xp / nextNeeded) * 100);
+                    document.getElementById('xp-bar-fill').style.width = pct + '%';
+                }, 50);
             }
+
             start() {
                 this.resize();
                 window.addEventListener('resize', () => this.resize());
@@ -2694,33 +2857,23 @@
                     this.state.totalEarned += v;
 
                     const fn = f.mutations.map(m => m.name).join(" ") + (f.mutations.length ? " " : "") + f.template.name;
-                    this.showFishNotification(f, v);
 
-                    // XP system rebalanced
-                    let xpGain =
+                    // Calculate XP FIRST
+                    let baseXP =
                         f.xpBase *
-                        Math.pow(f.weight, 0.6) *      // gentler weight scaling
-                        (f.value / 15) *                // lower divisor = more XP
-                        (1 + this.combo * 0.12);        // better combo bonus
+                        Math.pow(f.weight, 0.5) *
+                        (f.value / 20) *
+                        (1 + this.combo * 0.08);
 
-                    // mutation bonus
-                    if (f.mutations.length > 0) {
-                        xpGain *= 1 + (f.mutations.length * 0.6);
+                    baseXP = baseXP * (0.8 + Math.random() * 0.4);
 
-                        f.mutations.forEach(m => {
-                            if (m.class === "Legendary") xpGain *= 2;
-                            if (m.class === "Mythical") xpGain *= 4;
-                            if (m.class === "Divine") xpGain *= 8;
-                        });
-                    }
+                    // Call addXP and get result
+                    const xpResult = this.addXP(Math.floor(baseXP), f.template.rarity, f.mutations);
+                    const xpGained = xpResult.gained;
+                    const levelsGained = xpResult.levels;
 
-                    // rarity burst
-                    const rarityIndex = CONFIG.rarities[f.template.rarity].index;
-                    if (rarityIndex >= 4) xpGain *= 2;
-                    if (rarityIndex >= 5) xpGain *= 3;
-                    if (rarityIndex >= 6) xpGain *= 5;
-
-                    this.addXP(Math.floor(xpGain));
+                    // THEN show notification with XP
+                    this.showFishNotification(f, v, xpGained);
 
                     let sx = this.canvas.width / 2;
                     if (this.bittenHooksPositions[i]) sx = this.bittenHooksPositions[i].x;
@@ -2770,35 +2923,109 @@
                 this.combo = 0;
             }
 
-            addXP(a) {
-                // Gentle, satisfying XP curve - fast early, reasonable late
-                let xpGain = a;
+            async addXP(rawXP, fishRarity = null, fishMutations = []) {
+                // Get current level
+                const level = this.state.level;
 
-                // Bonus for higher level catches (keeps momentum)
-                if (this.state.level > 20) xpGain *= 1.2;
-                if (this.state.level > 50) xpGain *= 1.3;
+                // AUTO-SCALING FORMULA:
+                // XP needed = base * (1 + level ^ 0.7)
+                // This grows slower than exponential but keeps scaling forever
 
-                this.state.xp += Math.floor(xpGain);
+                // First, calculate how much XP is "worth" at this level
+                const currentNeeded = Math.floor(80 * (1 + Math.pow(level, 0.7)));
 
-                // Level up loop - much gentler curve
-                let leveled = false;
-                while (this.state.level < 200) {
-                    // Smoother curve: starts at 80 XP, grows slowly
-                    const needed = Math.floor(80 + (this.state.level * 8) + Math.pow(this.state.level, 1.2) * 2.5);
+                // Scale down raw XP based on level (diminishing returns)
+                // Level 1: 100% of XP
+                // Level 100: ~25% of XP
+                // Level 500: ~8% of XP
+                // Level 1000: ~4% of XP
+                let scalingFactor = 1 / (1 + Math.pow(level / 50, 1.2));
+                scalingFactor = Math.max(0.02, Math.min(1, scalingFactor)); // Never below 2%
+
+                let finalXP = Math.floor(rawXP * scalingFactor);
+
+                // Bonus for rare fish (percentage based, scales with level)
+                let rarityBonus = 1.0;
+                if (fishRarity) {
+                    const rarityIndex = CONFIG.rarities[fishRarity]?.index || 0;
+                    // Rare fish give a multiplier that ALSO scales with level
+                    // High level players still get excited about rare fish
+                    rarityBonus = 1 + (rarityIndex * 0.15) * (1 + Math.log10(level + 1) * 0.1);
+                    rarityBonus = Math.min(3.5, rarityBonus); // Cap at 3.5x
+                }
+
+                // Mutation bonus (scales with level too)
+                let mutationBonus = 1.0;
+                if (fishMutations && fishMutations.length > 0) {
+                    mutationBonus = 1 + (fishMutations.length * 0.2);
+                    fishMutations.forEach(m => {
+                        const classBonus = {
+                            "Legendary": 0.3,
+                            "Mythical": 0.6,
+                            "Divine": 1.0,
+                            "Secret": 1.8
+                        };
+                        mutationBonus += classBonus[m.class] || 0;
+                    });
+                    mutationBonus = Math.min(3.0, mutationBonus);
+                }
+
+                finalXP = Math.floor(finalXP * rarityBonus * mutationBonus);
+
+                // Minimum XP gain (always feel progress)
+                finalXP = Math.max(5, finalXP);
+
+                // Add the XP
+                // Store old values before adding XP
+                const oldXP = this.state.xp;
+                const oldLevel = this.state.level;
+
+                // Add the XP
+                this.state.xp += finalXP;
+
+                // Level up loop - track how many levels we gain
+                let levelsGained = 0;
+                let totalXPNeeded = 0;
+
+                while (this.state.level < 99999) {
+                    const needed = Math.floor(80 * (1 + Math.pow(this.state.level, 0.7)));
+                    totalXPNeeded = needed;
 
                     if (this.state.xp >= needed) {
                         this.state.xp -= needed;
-                        this.levelUp();
-                        leveled = true;
+                        this.levelUp(); // This increments level
+                        levelsGained++;
                     } else {
                         break;
                     }
                 }
 
-                // Update XP bar with current level requirement
-                const currentNeeded = Math.floor(80 + (this.state.level * 8) + Math.pow(this.state.level, 1.2) * 2.5);
-                const pct = Math.min(100, (this.state.xp / currentNeeded) * 100);
-                document.getElementById('xp-bar-fill').style.width = pct + '%';
+                // Store new values
+                const newXP = this.state.xp;
+                const newLevel = this.state.level;
+
+                // Visual feedback for levels gained (popup)
+                if (levelsGained > 5) {
+                    this.showComboPopup(`🔥 ${levelsGained} LEVELS! 🔥`, "#facc15");
+                } else if (levelsGained > 1) {
+                    this.showComboPopup(`${levelsGained}x LEVEL UP!`, "#c084fc");
+                }
+
+                // Show XP gain with cool effect (always show, even for small gains)
+                this.createNotif(`+${finalXP.toLocaleString()} XP!`, this.canvas.width / 2, this.canvas.height / 2 + 40,
+                    finalXP > 100 ? "#facc15" : (finalXP > 50 ? "#c084fc" : "#a78bfa"));
+
+                // Animate the XP bar (this handles the visual scrolling)
+                await this.animateXPBar(newXP, newLevel, oldXP, oldLevel);
+
+                // Update tooltip with exact numbers
+                const nextNeeded = Math.floor(80 * (1 + Math.pow(this.state.level, 0.7)));
+                const levelBadge = document.getElementById('level-badge');
+                if (levelBadge) {
+                    levelBadge.title = `${this.state.xp.toLocaleString()} / ${nextNeeded.toLocaleString()} XP to level ${this.state.level + 1}`;
+                }
+
+                return { gained: finalXP, levels: levelsGained };
             }
 
 
@@ -2807,6 +3034,13 @@
                 this.createNotif("LEVEL UP! Lv." + this.state.level, this.canvas.width / 2, this.canvas.height / 3, "#4ade80");
                 this.log("Level Up! Now Lv." + this.state.level, "#4ade80");
                 this.updateUI();
+
+                // Force XP text update immediately
+                const nextNeeded = Math.floor(80 * (1 + Math.pow(this.state.level, 0.7)));
+                const xpText = document.getElementById('xp-text');
+                if (xpText) {
+                    xpText.innerHTML = `${Math.floor(this.state.xp).toLocaleString()} / ${nextNeeded.toLocaleString()} XP`;
+                }
             }
 
 
@@ -2822,20 +3056,24 @@
                 setTimeout(() => el.remove(), 1300);
             }
 
-            showFishNotification(fish, finalValue) {
+            showFishNotification(fish, finalValue, xpGained = 0) {
                 const c = document.getElementById('notification-container');
                 if (c.children.length >= 4) c.removeChild(c.firstChild);
                 const n = document.createElement('div');
                 n.className = 'fish-notif';
                 let hc = CONFIG.rarities[fish.template.rarity].color;
                 fish.mutations.forEach(m => {
-                    if (MUTATION_CLASSES[m.class].id > 3) hc = MUTATION_CLASSES[m.class].color;
+                    if (MUTATION_CLASSES[m.class]?.id > 3) hc = MUTATION_CLASSES[m.class].color;
                 });
                 n.style.borderLeftColor = hc;
                 let mh = fish.mutations.slice(0, 3).map(m =>
                     `<span class="mut-tag" data-class="${MUTATION_CLASSES[m.class].class}" style="background:${MUTATION_CLASSES[m.class].color}">${m.name}</span>`
                 ).join('');
-                n.innerHTML = `<div class="fn-name" style="color:${hc}">${fish.template.name}</div>${mh ? `<div class="fn-muts">${mh}</div>` : ''}<div class="fn-wt">⚖️ ${fish.weight}kg</div><div class="fn-val">💵 +$${finalValue.toLocaleString()}</div>`;
+                n.innerHTML = `<div class="fn-name" style="color:${hc}">${fish.template.name}</div>
+                   ${mh ? `<div class="fn-muts">${mh}</div>` : ''}
+                   <div class="fn-wt">⚖️ ${fish.weight}kg</div>
+                   <div class="fn-val">💵 +$${finalValue.toLocaleString()}</div>
+                   <div class="fn-wt" style="color:#c084fc">✨ +${xpGained.toLocaleString()} XP</div>`;
                 c.appendChild(n);
                 setTimeout(() => { if (n.parentNode) n.remove(); }, 5100);
             }
@@ -2928,9 +3166,16 @@
                 document.getElementById('weather-effect-display').innerText = wd.desc;
                 document.getElementById('weather-banner').innerText = wd.emoji + ' ' + this.state.weather;
                 document.getElementById('weather-banner').style.color = this.state.weather === 'Bloodmoon' ? '#ef4444' : this.state.weather === 'Eclipse' ? '#818cf8' : this.state.weather === 'Blizzard' ? '#bae6fd' : '#e2e8f0';
-                const needed = this.state.level * 120 + Math.pow(this.state.level, 1.8) * 8;
-                const pct = Math.min(100, (this.state.xp / needed) * 100);
+                // Calculate XP needed for NEXT level
+                const nextNeeded = Math.floor(80 * (1 + Math.pow(this.state.level, 0.7)));
+                const pct = Math.min(100, (this.state.xp / nextNeeded) * 100);
                 document.getElementById('xp-bar-fill').style.width = pct + '%';
+
+                // Update XP text display
+                const xpText = document.getElementById('xp-text');
+                if (xpText) {
+                    xpText.innerHTML = `${Math.floor(this.state.xp).toLocaleString()} / ${nextNeeded.toLocaleString()} XP`;
+                }
             }
 
             renderShop() {
@@ -3701,6 +3946,7 @@
             stateManager._handleSlotDelete = (slotName) => {
                 stateManager.states.saveSelect._handleSlotDelete(slotName);
             };
+
         });
         // Make sure gameCore is always accessible
         Object.defineProperty(window, 'gameCore', {
