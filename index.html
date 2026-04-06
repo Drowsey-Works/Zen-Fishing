@@ -1634,12 +1634,12 @@
         // ============================================================
         const CONFIG = {
             rarities: {
-                COMMON: { index: 0, color: '#94a3b8', weight: 75, diffMult: 1, xpBase: 5 },
-                UNCOMMON: { index: 1, color: '#4ade80', weight: 18, diffMult: 1.8, xpBase: 15 },
-                RARE: { index: 2, color: '#60a5fa', weight: 5, diffMult: 3.5, xpBase: 40 },
-                EPIC: { index: 3, color: '#c084fc', weight: 1.5, diffMult: 6, xpBase: 120 },
-                LEGENDARY: { index: 4, color: '#fbbf24', weight: 0.4, diffMult: 12, xpBase: 400 },
-                MYTHICAL: { index: 5, color: '#f43f5e', weight: 0.08, diffMult: 25, xpBase: 1500 },
+                COMMON: { index: 0, color: '#94a3b8', weight: 75, diffMult: 1, xpBase: 20 },
+                UNCOMMON: { index: 1, color: '#4ade80', weight: 18, diffMult: 1.8, xpBase: 60 },
+                RARE: { index: 2, color: '#60a5fa', weight: 5, diffMult: 3.5, xpBase: 150 },
+                EPIC: { index: 3, color: '#c084fc', weight: 1.5, diffMult: 6, xpBase: 500 },
+                LEGENDARY: { index: 4, color: '#fbbf24', weight: 0.4, diffMult: 12, xpBase: 2000 },
+                MYTHICAL: { index: 5, color: '#f43f5e', weight: 0.08, diffMult: 25, xpBase: 8000 },
                 DIVINE: { index: 6, color: '#ffffff', weight: 0.02, diffMult: 50, xpBase: 6000 }
             },
             areas: [
@@ -2697,8 +2697,30 @@
                     this.showFishNotification(f, v);
 
                     // XP system rebalanced
-                    const xpGain = Math.floor(f.xpBase * (1 + this.combo * 0.05));
-                    this.addXP(xpGain);
+                    let xpGain =
+                        f.xpBase *
+                        Math.pow(f.weight, 0.6) *      // gentler weight scaling
+                        (f.value / 15) *                // lower divisor = more XP
+                        (1 + this.combo * 0.12);        // better combo bonus
+
+                    // mutation bonus
+                    if (f.mutations.length > 0) {
+                        xpGain *= 1 + (f.mutations.length * 0.6);
+
+                        f.mutations.forEach(m => {
+                            if (m.class === "Legendary") xpGain *= 2;
+                            if (m.class === "Mythical") xpGain *= 4;
+                            if (m.class === "Divine") xpGain *= 8;
+                        });
+                    }
+
+                    // rarity burst
+                    const rarityIndex = CONFIG.rarities[f.template.rarity].index;
+                    if (rarityIndex >= 4) xpGain *= 2;
+                    if (rarityIndex >= 5) xpGain *= 3;
+                    if (rarityIndex >= 6) xpGain *= 5;
+
+                    this.addXP(Math.floor(xpGain));
 
                     let sx = this.canvas.width / 2;
                     if (this.bittenHooksPositions[i]) sx = this.bittenHooksPositions[i].x;
@@ -2749,30 +2771,32 @@
             }
 
             addXP(a) {
-                // More balanced XP curve - scales properly with level
-                const areaMult = Math.min(1.5, 1 / (CONFIG.areas[this.state.currentArea].diffMult || 1));
-                const levelFactor = 1 / (1 + this.state.level * 0.02);
-                const scaledXP = Math.floor(a * areaMult * levelFactor);
+                // Gentle, satisfying XP curve - fast early, reasonable late
+                let xpGain = a;
 
-                this.state.xp += scaledXP;
+                // Bonus for higher level catches (keeps momentum)
+                if (this.state.level > 20) xpGain *= 1.2;
+                if (this.state.level > 50) xpGain *= 1.3;
 
-                // Loop until all possible level-ups are processed
-                let leveledUp = false;
+                this.state.xp += Math.floor(xpGain);
+
+                // Level up loop - much gentler curve
+                let leveled = false;
                 while (this.state.level < 200) {
-                    // Recalculate needed XP for current level each time
-                    const needed = Math.floor(100 + (this.state.level * 15) + Math.pow(this.state.level, 1.5) * 5);
+                    // Smoother curve: starts at 80 XP, grows slowly
+                    const needed = Math.floor(80 + (this.state.level * 8) + Math.pow(this.state.level, 1.2) * 2.5);
 
                     if (this.state.xp >= needed) {
                         this.state.xp -= needed;
                         this.levelUp();
-                        leveledUp = true;
+                        leveled = true;
                     } else {
                         break;
                     }
                 }
 
-                // Update XP bar with current level's requirement
-                const currentNeeded = Math.floor(100 + (this.state.level * 15) + Math.pow(this.state.level, 1.5) * 5);
+                // Update XP bar with current level requirement
+                const currentNeeded = Math.floor(80 + (this.state.level * 8) + Math.pow(this.state.level, 1.2) * 2.5);
                 const pct = Math.min(100, (this.state.xp / currentNeeded) * 100);
                 document.getElementById('xp-bar-fill').style.width = pct + '%';
             }
@@ -3707,4 +3731,3 @@
 </body>
 
 </html>
-
